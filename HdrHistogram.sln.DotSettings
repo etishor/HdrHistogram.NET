@@ -1,0 +1,9 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=Fix_0020header/@EntryIndexedValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;Profile name="Fix header"&gt;&lt;CSUpdateFileHeader&gt;True&lt;/CSUpdateFileHeader&gt;&lt;XAMLCollapseEmptyTags&gt;False&lt;/XAMLCollapseEmptyTags&gt;&lt;/Profile&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">Written by Gil Tene of Azul Systems, and released to the public domain,&#xD;
+as explained at http://creativecommons.org/publicdomain/zero/1.0/&#xD;
+&#xD;
+Ported to .NET by Iulian Margarintescu under the same license and terms as the java version&#xD;
+Java Version repo: https://github.com/HdrHistogram/HdrHistogram&#xD;
+Latest ported version is available in the Java submodule in the root of the repo&#xD;
+</s:String></wpf:ResourceDictionary>
