@@ -102,5 +102,10 @@ namespace HdrHistogram
         {
             throw new System.NotImplementedException();
         }
+
+        internal int getInt(int p)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -285,7 +285,7 @@ namespace HdrHistogram
             return autoResize;
         }
 
-        public void setAutoResize(bool autoResize)
+        public virtual void setAutoResize(bool autoResize)
         {
             this.autoResize = autoResize;
         }

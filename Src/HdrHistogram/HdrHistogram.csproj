@@ -55,7 +55,11 @@
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.1\ThreadLocalRandom.cs" />
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.1\VolatileDouble.cs" />
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.1\VolatileLong.cs" />
+    <Compile Include="AtomicHistogram.cs" />
+    <Compile Include="AtomicLongArray.cs" />
+    <Compile Include="ConcurrentHistogram.cs" />
     <Compile Include="EncodableHistogram.cs" />
+    <Compile Include="Recorder.cs" />
     <Compile Include="TODO\ByteBuffer.cs" />
     <Compile Include="TODO\Deflater.cs" />
     <Compile Include="Histogram.cs" />
@@ -72,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecordedValuesIterator.cs" />
     <Compile Include="TODO\ShortBuffer.cs" />
+    <Compile Include="WriterReaderPhaser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
