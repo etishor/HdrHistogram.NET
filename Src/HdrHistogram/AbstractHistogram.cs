@@ -1072,7 +1072,7 @@ namespace HdrHistogram
          * get the start time stamp [optionally] stored with this histogram
          * @return the start time stamp [optionally] stored with this histogram
          */
-        public long getStartTimeStamp()
+        public override long getStartTimeStamp()
         {
             return startTimeStampMsec;
         }
@@ -1081,7 +1081,7 @@ namespace HdrHistogram
          * Set the start time stamp value associated with this histogram to a given value.
          * @param timeStampMsec the value to set the time stamp to, [by convention] in msec since the epoch.
          */
-        public void setStartTimeStamp(long timeStampMsec)
+        public override void setStartTimeStamp(long timeStampMsec)
         {
             this.startTimeStampMsec = timeStampMsec;
         }
@@ -1090,7 +1090,7 @@ namespace HdrHistogram
          * get the end time stamp [optionally] stored with this histogram
          * @return the end time stamp [optionally] stored with this histogram
          */
-        public long getEndTimeStamp()
+        public override long getEndTimeStamp()
         {
             return endTimeStampMsec;
         }
@@ -1099,7 +1099,7 @@ namespace HdrHistogram
          * Set the end time stamp value associated with this histogram to a given value.
          * @param timeStampMsec the value to set the time stamp to, [by convention] in msec since the epoch.
          */
-        public void setEndTimeStamp(long timeStampMsec)
+        public override void setEndTimeStamp(long timeStampMsec)
         {
             this.endTimeStampMsec = timeStampMsec;
         }
@@ -1155,7 +1155,7 @@ namespace HdrHistogram
          *
          * @return the Max value recorded in the histogram
          */
-        public double getMaxValueAsDouble()
+        public override double getMaxValueAsDouble()
         {
             return getMaxValue();
         }
@@ -1721,7 +1721,7 @@ namespace HdrHistogram
          * @return the capacity needed to encode this histogram into a ByteBuffer
          */
         //@Override
-        public int getNeededByteBufferCapacity()
+        public override int getNeededByteBufferCapacity()
         {
             return getNeededByteBufferCapacity(countsArrayLength);
         }
@@ -1813,7 +1813,7 @@ namespace HdrHistogram
          */
         //@Override
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public int encodeIntoCompressedByteBuffer(ByteBuffer targetBuffer, int compressionLevel)
+        public override int encodeIntoCompressedByteBuffer(ByteBuffer targetBuffer, int compressionLevel)
         {
             int neededCapacity = getNeededByteBufferCapacity(countsArrayLength);
             if (intermediateUncompressedByteBuffer == null || intermediateUncompressedByteBuffer.capacity() < neededCapacity)

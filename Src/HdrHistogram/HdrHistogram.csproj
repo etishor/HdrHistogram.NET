@@ -55,6 +55,7 @@
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.1\ThreadLocalRandom.cs" />
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.1\VolatileDouble.cs" />
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.1\VolatileLong.cs" />
+    <Compile Include="EncodableHistogram.cs" />
     <Compile Include="TODO\ByteBuffer.cs" />
     <Compile Include="TODO\Deflater.cs" />
     <Compile Include="Histogram.cs" />
