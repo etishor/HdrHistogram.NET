@@ -1,4 +1,10 @@
-﻿using System;
+﻿// Written by Gil Tene of Azul Systems, and released to the public domain,
+// as explained at http://creativecommons.org/publicdomain/zero/1.0/
+// 
+// Ported to .NET by Iulian Margarintescu under the same license and terms as the java version
+// Java Version repo: https://github.com/HdrHistogram/HdrHistogram
+// Latest ported version is available in the Java submodule in the root of the repo
+using System;
 using FluentAssertions;
 using Xunit;
 
@@ -16,23 +22,23 @@ namespace HdrHistogram.Tests
             testShiftNonLowestBucket(histogram);
         }
 
+        [Fact]
+        public void testIntHistogramShift()
+        {
+            IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, 3);
+            testShiftLowestBucket(intCountsHistogram);
+            testShiftNonLowestBucket(intCountsHistogram);
+        }
+
+        [Fact]
+        public void testShortHistogramShift()
+        {
+            ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, 3);
+            testShiftLowestBucket(shortCountsHistogram);
+            testShiftNonLowestBucket(shortCountsHistogram);
+        }
+
         // TODO: uncomment when ported
-
-        //[Fact]
-        //public void testIntHistogramShift()
-        //{
-        //    IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, 3);
-        //    testShiftLowestBucket(intCountsHistogram);
-        //    testShiftNonLowestBucket(intCountsHistogram);
-        //}
-
-        //[Fact]
-        //public void testShortHistogramShift()
-        //{
-        //    ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, 3);
-        //    testShiftLowestBucket(shortCountsHistogram);
-        //    testShiftNonLowestBucket(shortCountsHistogram);
-        //}
 
         //[Fact]
         //public void testSynchronizedHistogramShift()

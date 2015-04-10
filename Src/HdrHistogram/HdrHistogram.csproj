@@ -60,7 +60,9 @@
     <Compile Include="AtomicHistogram.cs" />
     <Compile Include="ConcurrentHistogram.cs" />
     <Compile Include="EncodableHistogram.cs" />
+    <Compile Include="IntCountsHistogram.cs" />
     <Compile Include="Recorder.cs" />
+    <Compile Include="ShortCountsHistogram.cs" />
     <Compile Include="TODO\ByteBuffer.cs" />
     <Compile Include="TODO\Deflater.cs" />
     <Compile Include="Histogram.cs" />

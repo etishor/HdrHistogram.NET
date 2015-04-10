@@ -1,4 +1,10 @@
-﻿using FluentAssertions;
+﻿// Written by Gil Tene of Azul Systems, and released to the public domain,
+// as explained at http://creativecommons.org/publicdomain/zero/1.0/
+// 
+// Ported to .NET by Iulian Margarintescu under the same license and terms as the java version
+// Java Version repo: https://github.com/HdrHistogram/HdrHistogram
+// Latest ported version is available in the Java submodule in the root of the repo
+using FluentAssertions;
 using Xunit;
 
 namespace HdrHistogram.Tests
@@ -81,27 +87,27 @@ namespace HdrHistogram.Tests
         //    }
         //}
 
-        //[Fact]
-        //public void testIntCountsHistogramAutoSizing()
-        //{
-        //    IntCountsHistogram histogram = new IntCountsHistogram(3);
-        //    for (int i = 0; i < 63; i++)
-        //    {
-        //        long value = 1L << i;
-        //        histogram.recordValue(value);
-        //    }
-        //}
+        [Fact]
+        public void testIntCountsHistogramAutoSizing()
+        {
+            IntCountsHistogram histogram = new IntCountsHistogram(3);
+            for (int i = 0; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+        }
 
-        //[Fact]
-        //public void testShortCountsHistogramAutoSizing()
-        //{
-        //    ShortCountsHistogram histogram = new ShortCountsHistogram(3);
-        //    for (int i = 0; i < 63; i++)
-        //    {
-        //        long value = 1L << i;
-        //        histogram.recordValue(value);
-        //    }
-        //}
+        [Fact]
+        public void testShortCountsHistogramAutoSizing()
+        {
+            ShortCountsHistogram histogram = new ShortCountsHistogram(3);
+            for (int i = 0; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+        }
 
         //[Fact]
         //public void testDoubleHistogramAutoSizingUp()

@@ -5,15 +5,27 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace HdrHistogram
 {
     class IntBuffer
     {
         internal long get()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void rewind()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void put(int[] counts, int zeroIndex, int lengthFromZeroIndexToEnd)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void get(int[] counts, int p, int length)
         {
             throw new NotImplementedException();
         }
