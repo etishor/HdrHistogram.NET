@@ -1859,12 +1859,12 @@ namespace HdrHistogram
 
         private static Type[] constructorArgsTypes = { typeof(long), typeof(long), typeof(int) };
 
-        //static AbstractHistogram decodeFromByteBuffer(ByteBuffer buffer, Type histogramClass, long minBarForHighestTrackableValue)
-        //{
-        //    return decodeFromByteBuffer(buffer, histogramClass, minBarForHighestTrackableValue, null, null);
-        //}
+        internal static AbstractHistogram decodeFromByteBuffer(ByteBuffer buffer, Type histogramClass, long minBarForHighestTrackableValue)
+        {
+            return decodeFromByteBuffer(buffer, histogramClass, minBarForHighestTrackableValue, null, null);
+        }
 
-        static AbstractHistogram decodeFromByteBuffer(
+        internal static AbstractHistogram decodeFromByteBuffer(
                 ByteBuffer buffer,
                 Type histogramClass,
                 long minBarForHighestTrackableValue,

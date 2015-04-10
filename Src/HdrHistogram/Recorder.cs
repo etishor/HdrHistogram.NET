@@ -5,33 +5,36 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HdrHistogram
 {
 
-/**
- * Records integer values, and provides stable interval {@link Histogram} samples from
- * live recorded data without interrupting or stalling active recording of values. Each interval
- * histogram provided contains all value counts accumulated since the previous interval histogram
- * was taken.
- * <p>
- * This pattern is commonly used in logging interval histogram information while recording is ongoing.
- * <p>
- * {@link Recorder} supports concurrent
- * {@link Recorder#recordValue} or
- * {@link Recorder#recordValueWithExpectedInterval} calls.
- * Recording calls are wait-free on architectures that support atomic increment operations, and
- * are lock-free on architectures that do not.
- *
- */
+    /**
+     * Records integer values, and provides stable interval {@link Histogram} samples from
+     * live recorded data without interrupting or stalling active recording of values. Each interval
+     * histogram provided contains all value counts accumulated since the previous interval histogram
+     * was taken.
+     * <p>
+     * This pattern is commonly used in logging interval histogram information while recording is ongoing.
+     * <p>
+     * {@link Recorder} supports concurrent
+     * {@link Recorder#recordValue} or
+     * {@link Recorder#recordValueWithExpectedInterval} calls.
+     * Recording calls are wait-free on architectures that support atomic increment operations, and
+     * are lock-free on architectures that do not.
+     *
+     */
 
     public class Recorder
     {
+        private static readonly long factor = 1000L / Stopwatch.Frequency;
+        private static long CurentTimeInMilis()
+        {
+            return Stopwatch.GetTimestamp() * factor;
+        }
+
         private static AtomicLong instanceIdSequencer = new AtomicLong(1);
         private long instanceId = instanceIdSequencer.GetAndIncrement();
 
@@ -53,7 +56,7 @@ namespace HdrHistogram
         {
             activeHistogram = new InternalConcurrentHistogram(instanceId, numberOfSignificantValueDigits);
             inactiveHistogram = new InternalConcurrentHistogram(instanceId, numberOfSignificantValueDigits);
-            activeHistogram.setStartTimeStamp(System.currentTimeMillis());
+            activeHistogram.setStartTimeStamp(CurentTimeInMilis());
         }
 
         /**
@@ -95,7 +98,7 @@ namespace HdrHistogram
                 numberOfSignificantValueDigits);
             inactiveHistogram = new InternalAtomicHistogram(instanceId, lowestDiscernibleValue, highestTrackableValue,
                 numberOfSignificantValueDigits);
-            activeHistogram.setStartTimeStamp(System.currentTimeMillis());
+            activeHistogram.setStartTimeStamp(CurentTimeInMilis());
         }
 
         /**
@@ -268,7 +271,7 @@ namespace HdrHistogram
                 activeHistogram = tempHistogram;
 
                 // Mark end time of previous interval and start time of new one:
-                long now = System.currentTimeMillis();
+                long now = CurentTimeInMilis();
                 activeHistogram.setStartTimeStamp(now);
                 inactiveHistogram.setEndTimeStamp(now);
 
@@ -287,8 +290,7 @@ namespace HdrHistogram
         {
             public long containingInstanceId;
 
-            private InternalAtomicHistogram(long id, long lowestDiscernibleValue, long highestTrackableValue,
-                int numberOfSignificantValueDigits)
+            public InternalAtomicHistogram(long id, long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
                 : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
             {
 
@@ -296,11 +298,11 @@ namespace HdrHistogram
             }
         }
 
-        private class InternalConcurrentHistogram : ConcurrentHistogram
+        public class InternalConcurrentHistogram : ConcurrentHistogram
         {
             public long containingInstanceId;
 
-            private InternalConcurrentHistogram(long id, int numberOfSignificantValueDigits)
+            public InternalConcurrentHistogram(long id, int numberOfSignificantValueDigits)
                 : base(numberOfSignificantValueDigits)
             {
                 this.containingInstanceId = id;

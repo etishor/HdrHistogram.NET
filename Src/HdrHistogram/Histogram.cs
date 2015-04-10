@@ -223,7 +223,7 @@ namespace HdrHistogram
         {
         }
 
-        private Histogram(AbstractHistogram source, bool allocateCountsArray)
+        protected Histogram(AbstractHistogram source, bool allocateCountsArray)
             : base(source)
         {
             if (allocateCountsArray)
@@ -233,7 +233,7 @@ namespace HdrHistogram
             wordSizeInBytes = 8;
         }
 
-        private Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool allocateCountsArray)
+        protected Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool allocateCountsArray)
             : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
         {
             if (allocateCountsArray)
@@ -251,7 +251,7 @@ namespace HdrHistogram
          */
         public static Histogram decodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
-            return (Histogram)AbstractHistogram.decodeFromCompressedByteBuffer(buffer, typeof(Histogram), minBarForHighestTrackableValue);
+            return (Histogram)AbstractHistogram.decodeFromByteBuffer(buffer, typeof(Histogram), minBarForHighestTrackableValue);
         }
 
         /**

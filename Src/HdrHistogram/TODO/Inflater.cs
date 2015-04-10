@@ -5,13 +5,10 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace HdrHistogram
 {
-    class Inflater
+    internal class Inflater
     {
         internal int inflate(byte[] p)
         {

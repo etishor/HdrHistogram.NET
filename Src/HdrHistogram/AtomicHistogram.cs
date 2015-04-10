@@ -5,65 +5,62 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace HdrHistogram
 {
 
-/**
- * <h3>A High Dynamic Range (HDR) Histogram using atomic <b><code>long</code></b> count type </h3>
- * An AtomicHistogram guarantees lossless recording of values into the histogram even when the
- * histogram is updated by multiple threads. It is important to note though that this lossless
- * recording capability is the only thread-safe behavior provided by AtomicHistogram, and that it
- * is not otherwise synchronized. Specifically, AtomicHistogram does not support auto-resizing,
- * does not support value shift operations, and provides no implicit synchronization
- * that would prevent the contents of the histogram from changing during iterations, copies, or
- * addition operations on the histogram. Callers wishing to make potentially concurrent,
- * multi-threaded updates that would safely work in the presence of queries, copies, or additions
- * of histogram objects should either take care to externally synchronize and/or order their access,
- * use the {@link org.HdrHistogram.SynchronizedHistogram} variant, or (recommended) use the
- * {@link Recorder} class, which is intended for this purpose.
- * <p>
- * See package description for {@link org.HdrHistogram} for details.
- */
+    /**
+     * <h3>A High Dynamic Range (HDR) Histogram using atomic <b><code>long</code></b> count type </h3>
+     * An AtomicHistogram guarantees lossless recording of values into the histogram even when the
+     * histogram is updated by multiple threads. It is important to note though that this lossless
+     * recording capability is the only thread-safe behavior provided by AtomicHistogram, and that it
+     * is not otherwise synchronized. Specifically, AtomicHistogram does not support auto-resizing,
+     * does not support value shift operations, and provides no implicit synchronization
+     * that would prevent the contents of the histogram from changing during iterations, copies, or
+     * addition operations on the histogram. Callers wishing to make potentially concurrent,
+     * multi-threaded updates that would safely work in the presence of queries, copies, or additions
+     * of histogram objects should either take care to externally synchronize and/or order their access,
+     * use the {@link org.HdrHistogram.SynchronizedHistogram} variant, or (recommended) use the
+     * {@link Recorder} class, which is intended for this purpose.
+     * <p>
+     * See package description for {@link org.HdrHistogram} for details.
+     */
 
     public class AtomicHistogram : Histogram
     {
         private AtomicLong totalCount;
-        private volatile AtomicLongArray counts;
+        private AtomicLongArray counts;
 
         internal override long getCountAtIndex(int index)
         {
-            return counts.get(index);
+            return counts.GetValue(index);
         }
 
         protected override long getCountAtNormalizedIndex(int index)
         {
-            return counts.get(index);
+            return counts.GetValue(index);
         }
 
         protected override void incrementCountAtIndex(int index)
         {
-            counts.getAndIncrement(index);
+            counts.GetAndIncrement(index);
         }
 
         protected override void addToCountAtIndex(int index, long value)
         {
-            counts.getAndAdd(index, value);
+            counts.GetAndAdd(index, value);
         }
 
         protected override void setCountAtIndex(int index, long value)
         {
-            counts.lazySet(index, value);
+            counts.SetValue(index, value);
         }
 
         protected override void setCountAtNormalizedIndex(int index, long value)
         {
-            counts.lazySet(index, value);
+            counts.SetValue(index, value);
         }
 
         protected override int getNormalizingIndexOffset()
@@ -106,7 +103,7 @@ namespace HdrHistogram
         {
             for (int i = 0; i < counts.Length; i++)
             {
-                counts.lazySet(i, 0);
+                counts.SetValue(i, 0);
             }
             totalCount.SetValue(0);
         }
@@ -147,7 +144,7 @@ namespace HdrHistogram
 
         protected override int _getEstimatedFootprintInBytes()
         {
-            return (512 + (8*counts.Length));
+            return (512 + (8 * counts.Length));
         }
 
         /**
@@ -183,8 +180,7 @@ namespace HdrHistogram
      *                                       and separation. Must be a non-negative integer between 0 and 5.
      */
 
-        public AtomicHistogram(long lowestDiscernibleValue, long highestTrackableValue,
-            int numberOfSignificantValueDigits)
+        public AtomicHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
             : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, false)
         {
             counts = new AtomicLongArray(countsArrayLength);
@@ -211,10 +207,9 @@ namespace HdrHistogram
      * @return The newly constructed histogram
      */
 
-        public static AtomicHistogram decodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
+        internal static AtomicHistogram decodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
-            return
-                (AtomicHistogram) decodeFromByteBuffer(buffer, typeof (AtomicHistogram), minBarForHighestTrackableValue);
+            return (AtomicHistogram)AbstractHistogram.decodeFromByteBuffer(buffer, typeof(AtomicHistogram), minBarForHighestTrackableValue);
         }
 
         /**
@@ -225,12 +220,11 @@ namespace HdrHistogram
      * @throws DataFormatException on error parsing/decompressing the buffer
      */
 
-        public static AtomicHistogram decodeFromCompressedByteBuffer(ByteBuffer buffer,
-            long minBarForHighestTrackableValue)
+        public static AtomicHistogram decodeFromCompressedByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
             return
                 (AtomicHistogram)
-                    decodeFromCompressedByteBuffer(buffer, typeof (AtomicHistogram), minBarForHighestTrackableValue);
+                    decodeFromCompressedByteBuffer(buffer, typeof(AtomicHistogram), minBarForHighestTrackableValue);
         }
 
         private void readObject(Stream o)
@@ -245,7 +239,7 @@ namespace HdrHistogram
             LongBuffer logbuffer = buffer.asLongBuffer();
             for (int i = 0; i < length; i++)
             {
-                counts.lazySet(i, logbuffer.get());
+                counts.SetValue(i, logbuffer.get());
             }
         }
 
@@ -272,11 +266,11 @@ namespace HdrHistogram
             int remainingLengthFromNormalizedZeroIndex = length - lengthFromZeroIndexToEnd;
             for (int i = 0; i < lengthFromZeroIndexToEnd; i++)
             {
-                cachedDstLongBuffer.put(counts.get(zeroIndex + i));
+                cachedDstLongBuffer.put(counts.GetValue(zeroIndex + i));
             }
             for (int i = 0; i < remainingLengthFromNormalizedZeroIndex; i++)
             {
-                cachedDstLongBuffer.put(counts.get(i));
+                cachedDstLongBuffer.put(counts.GetValue(i));
             }
         }
     }

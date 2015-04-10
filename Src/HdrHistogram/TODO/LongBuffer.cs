@@ -32,5 +32,10 @@ namespace HdrHistogram
         {
             throw new NotImplementedException();
         }
+
+        internal void put(long p)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

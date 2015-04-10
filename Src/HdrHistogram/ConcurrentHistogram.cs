@@ -5,7 +5,7 @@ using System.Text;
 
 namespace HdrHistogram
 {
-    class ConcurrentHistogram : Histogram
+    public class ConcurrentHistogram : Histogram
     {
         public ConcurrentHistogram(int numberOfSignificantValueDigits) : base(numberOfSignificantValueDigits)
         {
