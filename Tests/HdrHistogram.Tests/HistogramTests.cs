@@ -54,7 +54,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram = new Histogram(1, numberOfSignificantValueDigits);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 thrown = true;
             }
@@ -67,7 +67,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram = new Histogram(highestTrackableValue, 6);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 thrown = true;
             }
@@ -80,7 +80,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram = new Histogram(highestTrackableValue, -1);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 thrown = true;
             }
@@ -249,7 +249,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram.add(biggerOther);
             }
-            catch (IndexOutOfRangeException e)
+            catch (IndexOutOfRangeException)
             {
                 thrown = true;
             }
@@ -293,7 +293,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram.subtract(other);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 thrown = true;
             }
@@ -325,7 +325,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram.subtract(biggerOther);
             }
-            catch (IndexOutOfRangeException e)
+            catch (IndexOutOfRangeException)
             {
                 thrown = true;
             }

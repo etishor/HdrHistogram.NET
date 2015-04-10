@@ -207,7 +207,7 @@ namespace HdrHistogram
      * @return The newly constructed histogram
      */
 
-        internal static AtomicHistogram decodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
+        internal new static AtomicHistogram decodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
             return (AtomicHistogram)AbstractHistogram.decodeFromByteBuffer(buffer, typeof(AtomicHistogram), minBarForHighestTrackableValue);
         }
@@ -220,7 +220,7 @@ namespace HdrHistogram
      * @throws DataFormatException on error parsing/decompressing the buffer
      */
 
-        public static AtomicHistogram decodeFromCompressedByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
+        public new static AtomicHistogram decodeFromCompressedByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
             return
                 (AtomicHistogram)

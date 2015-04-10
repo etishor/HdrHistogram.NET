@@ -50,9 +50,9 @@ namespace HdrHistogram
         // that they will have a good chance of ending up in the same cache line as the totalCounts and
         // counts array reference fields that subclass implementations will typically add.
         int leadingZeroCountBase;
-        int subBucketHalfCountMagnitude;
+        protected int subBucketHalfCountMagnitude;
         internal int unitMagnitude;
-        int subBucketHalfCount;
+        protected int subBucketHalfCount;
         long subBucketMask;
         AtomicLong maxValue = new AtomicLong(0);
         AtomicLong minNonZeroValue = new AtomicLong(long.MaxValue);
@@ -263,7 +263,7 @@ namespace HdrHistogram
             highestTrackableValue = newHighestTrackableValue;
         }
 
-        int determineArrayLengthNeeded(long highestTrackableValue)
+        protected int determineArrayLengthNeeded(long highestTrackableValue)
         {
             if (highestTrackableValue < 2L * lowestDiscernibleValue)
             {
@@ -2107,7 +2107,7 @@ namespace HdrHistogram
             return lengthNeeded;
         }
 
-        int countsArrayIndex(long value)
+        protected int countsArrayIndex(long value)
         {
             if (value < 0)
             {
