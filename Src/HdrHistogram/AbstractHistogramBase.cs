@@ -6,7 +6,7 @@
 // Latest ported version is available in the Java submodule in the root of the repo
 namespace HdrHistogram
 {
-    public abstract class AbstractHistogramBase : EncodableHistogram 
+    public abstract class AbstractHistogramBase : EncodableHistogram
     {
         protected static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
@@ -18,7 +18,7 @@ namespace HdrHistogram
         protected long lowestDiscernibleValue;
         protected int numberOfSignificantValueDigits;
 
-        protected int bucketCount;
+        protected internal int bucketCount;
         protected int subBucketCount;
         internal int countsArrayLength;
         protected int wordSizeInBytes;

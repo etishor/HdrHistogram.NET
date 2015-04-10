@@ -132,7 +132,7 @@ namespace HdrHistogram
         void updateMinNonZeroValue(long value)
         {
             long current;
-            while (value > (current = this.minNonZeroValue.GetValue()))
+            while (value < (current = this.minNonZeroValue.GetValue()))
             {
                 this.minNonZeroValue.CompareAndSwap(current, value);
             }
@@ -892,8 +892,8 @@ namespace HdrHistogram
          * @param other the other histogram to compare to
          * @return True if this histogram are equivalent with the other.
          */
-
-        public bool equals(object other)
+        
+        public override bool Equals(object other)
         {
             if (this == other)
             {
