@@ -85,7 +85,7 @@ namespace HdrHistogram
                 " Use ConcurrentHistogram Instead.");
         }
 
-        protected override void resize(long newHighestTrackableValue)
+        protected internal override void resize(long newHighestTrackableValue)
         {
             throw new InvalidOperationException(
                 "AtomicHistogram does not support resizing operations." +

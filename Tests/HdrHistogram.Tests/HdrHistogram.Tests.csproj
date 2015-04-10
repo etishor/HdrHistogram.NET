@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentHistogramTests.cs" />
     <Compile Include="HistogramTests.cs" />
     <Compile Include="MathUtilsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

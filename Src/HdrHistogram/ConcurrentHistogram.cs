@@ -291,7 +291,7 @@ namespace HdrHistogram
             }
         }
 
-        protected override void resize(long newHighestTrackableValue)
+        internal protected override void resize(long newHighestTrackableValue)
         {
             try
             {

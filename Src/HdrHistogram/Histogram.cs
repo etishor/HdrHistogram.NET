@@ -141,7 +141,7 @@ namespace HdrHistogram
             return (512 + (8 * counts.Length));
         }
 
-        protected override void resize(long newHighestTrackableValue)
+        protected internal override void resize(long newHighestTrackableValue)
         {
             int oldNormalizedZeroIndex = normalizeIndex(0, normalizingIndexOffset, countsArrayLength);
 

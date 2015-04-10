@@ -96,7 +96,7 @@ namespace HdrHistogram
 
         protected abstract int _getEstimatedFootprintInBytes();
 
-        protected abstract void resize(long newHighestTrackableValue);
+        protected internal abstract void resize(long newHighestTrackableValue);
 
         /**
          * Get the total count of all recorded values in the histogram
