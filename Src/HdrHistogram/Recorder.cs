@@ -36,9 +36,9 @@ namespace HdrHistogram
         }
 
         private static AtomicLong instanceIdSequencer = new AtomicLong(1);
-        private long instanceId = instanceIdSequencer.GetAndIncrement();
+        private readonly long instanceId = instanceIdSequencer.GetAndIncrement();
 
-        private WriterReaderPhaser recordingPhaser = new WriterReaderPhaser();
+        private readonly WriterReaderPhaser recordingPhaser = new WriterReaderPhaser();
 
         private volatile Histogram activeHistogram;
         private Histogram inactiveHistogram;
@@ -288,7 +288,7 @@ namespace HdrHistogram
 
         private class InternalAtomicHistogram : AtomicHistogram
         {
-            public long containingInstanceId;
+            public readonly long containingInstanceId;
 
             public InternalAtomicHistogram(long id, long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
                 : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
@@ -298,9 +298,9 @@ namespace HdrHistogram
             }
         }
 
-        public class InternalConcurrentHistogram : ConcurrentHistogram
+        private class InternalConcurrentHistogram : ConcurrentHistogram
         {
-            public long containingInstanceId;
+            public readonly long containingInstanceId;
 
             public InternalConcurrentHistogram(long id, int numberOfSignificantValueDigits)
                 : base(numberOfSignificantValueDigits)
