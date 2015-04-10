@@ -292,8 +292,7 @@ namespace HdrHistogram
      * @return The newly constructed histogram
      */
 
-        public static SynchronizedHistogram decodeFromByteBuffer(ByteBuffer buffer,
-            long minBarForHighestTrackableValue)
+        public new static SynchronizedHistogram decodeFromByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
             return (SynchronizedHistogram)decodeFromByteBuffer(buffer, typeof(SynchronizedHistogram), minBarForHighestTrackableValue);
         }
@@ -306,7 +305,7 @@ namespace HdrHistogram
      * @throws DataFormatException on error parsing/decompressing the buffer
      */
 
-        public static SynchronizedHistogram decodeFromCompressedByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
+        public new static SynchronizedHistogram decodeFromCompressedByteBuffer(ByteBuffer buffer, long minBarForHighestTrackableValue)
         {
             return (SynchronizedHistogram)decodeFromCompressedByteBuffer(buffer, typeof(SynchronizedHistogram), minBarForHighestTrackableValue);
         }

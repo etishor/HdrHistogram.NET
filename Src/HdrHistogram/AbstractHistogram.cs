@@ -43,6 +43,12 @@ namespace HdrHistogram
 
     public abstract class AbstractHistogram : AbstractHistogramBase
     {
+        public override int GetHashCode()
+        {
+            // compiler warns if equals is implemented without GetHashCode()
+            return base.identity.GetHashCode();
+        }
+
         private static readonly CultureInfo usCulture = CultureInfo.CreateSpecificCulture("en-US");
 
 
@@ -885,6 +891,7 @@ namespace HdrHistogram
         //
         //
         //
+
 
         /**
          * Determine if this histogram is equivalent to another.

@@ -38,7 +38,7 @@ namespace HdrHistogram
 
     public class ConcurrentHistogram : Histogram
     {
-        private AtomicLong totalCount = new AtomicLong();
+        private new AtomicLong totalCount = new AtomicLong();
 
         private int activeCountsNormalizingIndexOffset;
         private AtomicLongArray activeCounts;
