@@ -12,8 +12,6 @@ namespace HdrHistogram.Tests
 
     public class HistogramAutosizingTests
     {
-        private static readonly long highestTrackableValue = 3600L * 1000 * 1000; // e.g. for 1 hr in usec units
-
         [Fact]
         public void testHistogramAutoSizingEdges()
         {
@@ -24,6 +22,99 @@ namespace HdrHistogram.Tests
             histogram.recordValue(long.MaxValue);
             Assert.Equal(53, histogram.bucketCount);
             Assert.Equal(55296, histogram.countsArrayLength);
+        }
+
+        [Fact]
+        public void testHistogramAutoSizing()
+        {
+            Histogram histogram = new Histogram(3);
+            for (int i = 0; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+            Assert.Equal(53, histogram.bucketCount);
+            Assert.Equal(55296, histogram.countsArrayLength);
+        }
+
+        [Fact]
+        public void testConcurrentHistogramAutoSizing()
+        {
+            ConcurrentHistogram histogram = new ConcurrentHistogram(3);
+            for (int i = 9; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+        }
+
+        [Fact]
+        public void testSynchronizedHistogramAutoSizing()
+        {
+            SynchronizedHistogram histogram = new SynchronizedHistogram(3);
+            for (int i = 0; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+        }
+
+        [Fact]
+        public void testIntCountsHistogramAutoSizing()
+        {
+            IntCountsHistogram histogram = new IntCountsHistogram(3);
+            for (int i = 0; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+        }
+
+        [Fact]
+        public void testShortCountsHistogramAutoSizing()
+        {
+            ShortCountsHistogram histogram = new ShortCountsHistogram(3);
+            for (int i = 0; i < 63; i++)
+            {
+                long value = 1L << i;
+                histogram.recordValue(value);
+            }
+        }
+
+        [Fact]
+        public void testAutoSizingAdd()
+        {
+            Histogram histogram1 = new Histogram(2);
+            Histogram histogram2 = new Histogram(2);
+
+            histogram1.recordValue(1000L);
+            histogram1.recordValue(1000000000L);
+
+            histogram2.add(histogram1);
+
+            histogram2.valuesAreEquivalent(histogram2.getMaxValue(), 1000000000L).Should().BeTrue("Max should be equivalent to 1000000000L");
+        }
+
+        [Fact]
+        public void testAutoSizingAcrossContinuousRange()
+        {
+            Histogram histogram = new Histogram(2);
+
+            for (long i = 0; i < 10000000L; i++)
+            {
+                histogram.recordValue(i);
+            }
+        }
+
+        [Fact]
+        public void testAutoSizingAcrossContinuousRangeConcurrent()
+        {
+            Histogram histogram = new ConcurrentHistogram(2);
+
+            for (long i = 0; i < 1000000L; i++)
+            {
+                histogram.recordValue(i);
+            }
         }
 
         // TODO: uncomment when ported
@@ -51,63 +142,6 @@ namespace HdrHistogram.Tests
         //    Assert.Equal(56, histogram2.integerValuesHistogram.bucketCount);
         //    Assert.Equal(7296, histogram2.integerValuesHistogram.countsArrayLength);
         //}
-
-        [Fact]
-        public void testHistogramAutoSizing()
-        {
-            Histogram histogram = new Histogram(3);
-            for (int i = 0; i < 63; i++)
-            {
-                long value = 1L << i;
-                histogram.recordValue(value);
-            }
-            Assert.Equal(53, histogram.bucketCount);
-            Assert.Equal(55296, histogram.countsArrayLength);
-        }
-
-        [Fact]
-        public void testConcurrentHistogramAutoSizing()
-        {
-            ConcurrentHistogram histogram = new ConcurrentHistogram(3);
-            for (int i = 9; i < 63; i++)
-            {
-                long value = 1L << i;
-                histogram.recordValue(value);
-            }
-        }
-
-        //[Fact]
-        //public void testSynchronizedHistogramAutoSizing()
-        //{
-        //    SynchronizedHistogram histogram = new SynchronizedHistogram(3);
-        //    for (int i = 0; i < 63; i++)
-        //    {
-        //        long value = 1L << i;
-        //        histogram.recordValue(value);
-        //    }
-        //}
-
-        [Fact]
-        public void testIntCountsHistogramAutoSizing()
-        {
-            IntCountsHistogram histogram = new IntCountsHistogram(3);
-            for (int i = 0; i < 63; i++)
-            {
-                long value = 1L << i;
-                histogram.recordValue(value);
-            }
-        }
-
-        [Fact]
-        public void testShortCountsHistogramAutoSizing()
-        {
-            ShortCountsHistogram histogram = new ShortCountsHistogram(3);
-            for (int i = 0; i < 63; i++)
-            {
-                long value = 1L << i;
-                histogram.recordValue(value);
-            }
-        }
 
         //[Fact]
         //public void testDoubleHistogramAutoSizingUp()
@@ -152,42 +186,6 @@ namespace HdrHistogram.Tests
         //        histogram.recordValue(value);
         //    }
         //}
-
-        [Fact]
-        public void testAutoSizingAdd()
-        {
-            Histogram histogram1 = new Histogram(2);
-            Histogram histogram2 = new Histogram(2);
-
-            histogram1.recordValue(1000L);
-            histogram1.recordValue(1000000000L);
-
-            histogram2.add(histogram1);
-
-            histogram2.valuesAreEquivalent(histogram2.getMaxValue(), 1000000000L).Should().BeTrue("Max should be equivalent to 1000000000L");
-        }
-
-        [Fact]
-        public void testAutoSizingAcrossContinuousRange()
-        {
-            Histogram histogram = new Histogram(2);
-
-            for (long i = 0; i < 10000000L; i++)
-            {
-                histogram.recordValue(i);
-            }
-        }
-
-        [Fact]
-        public void testAutoSizingAcrossContinuousRangeConcurrent()
-        {
-            Histogram histogram = new ConcurrentHistogram(2);
-
-            for (long i = 0; i < 1000000L; i++)
-            {
-                histogram.recordValue(i);
-            }
-        }
 
         //[Fact]
         //public void testAutoSizingAddDouble()

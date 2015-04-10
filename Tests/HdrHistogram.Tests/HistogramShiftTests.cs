@@ -38,15 +38,14 @@ namespace HdrHistogram.Tests
             testShiftNonLowestBucket(shortCountsHistogram);
         }
 
-        // TODO: uncomment when ported
 
-        //[Fact]
-        //public void testSynchronizedHistogramShift()
-        //{
-        //    SynchronizedHistogram synchronizedHistogram = new SynchronizedHistogram(highestTrackableValue, 3);
-        //    testShiftLowestBucket(synchronizedHistogram);
-        //    testShiftNonLowestBucket(synchronizedHistogram);
-        //}
+        [Fact]
+        public void testSynchronizedHistogramShift()
+        {
+            SynchronizedHistogram synchronizedHistogram = new SynchronizedHistogram(highestTrackableValue, 3);
+            testShiftLowestBucket(synchronizedHistogram);
+            testShiftNonLowestBucket(synchronizedHistogram);
+        }
 
         [Fact]
         public void testAtomicHistogramShift()

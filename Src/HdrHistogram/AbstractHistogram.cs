@@ -110,7 +110,7 @@ namespace HdrHistogram
          * May be overridden by subclasses for synchronization or atomicity purposes.
          * @param value new maxValue to set
          */
-        protected void updatedMaxValue(long value)
+        protected internal virtual void updatedMaxValue(long value)
         {
             long current;
             while (value > (current = maxValue.GetValue()))
@@ -129,7 +129,7 @@ namespace HdrHistogram
          * May be overridden by subclasses for synchronization or atomicity purposes.
          * @param value new minNonZeroValue to set
          */
-        void updateMinNonZeroValue(long value)
+        protected internal virtual void updateMinNonZeroValue(long value)
         {
             long current;
             while (value < (current = this.minNonZeroValue.GetValue()))
@@ -725,7 +725,7 @@ namespace HdrHistogram
          *
          * @param numberOfBinaryOrdersOfMagnitude The number of binary orders of magnitude to shift by
          */
-        public void shiftValuesLeft(int numberOfBinaryOrdersOfMagnitude)
+        protected internal virtual void shiftValuesLeft(int numberOfBinaryOrdersOfMagnitude)
         {
             if (numberOfBinaryOrdersOfMagnitude < 0)
             {
@@ -833,7 +833,7 @@ namespace HdrHistogram
          * @param numberOfBinaryOrdersOfMagnitude The number of binary orders of magnitude to shift by
          */
 
-        public void shiftValuesRight(int numberOfBinaryOrdersOfMagnitude)
+        protected internal virtual void shiftValuesRight(int numberOfBinaryOrdersOfMagnitude)
         {
             if (numberOfBinaryOrdersOfMagnitude < 0)
             {
@@ -892,7 +892,7 @@ namespace HdrHistogram
          * @param other the other histogram to compare to
          * @return True if this histogram are equivalent with the other.
          */
-        
+
         public override bool Equals(object other)
         {
             if (this == other)

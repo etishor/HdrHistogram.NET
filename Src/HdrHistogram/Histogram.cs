@@ -46,9 +46,9 @@ namespace HdrHistogram
 
     public class Histogram : AbstractHistogram
     {
-        long totalCount;
-        long[] counts;
-        int normalizingIndexOffset;
+        protected long totalCount;
+        protected long[] counts;
+        protected int normalizingIndexOffset;
 
         internal override long getCountAtIndex(int index)
         {

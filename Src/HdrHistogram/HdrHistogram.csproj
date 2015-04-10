@@ -63,6 +63,7 @@
     <Compile Include="IntCountsHistogram.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="ShortCountsHistogram.cs" />
+    <Compile Include="SynchronizedHistogram.cs" />
     <Compile Include="TODO\ByteBuffer.cs" />
     <Compile Include="TODO\Deflater.cs" />
     <Compile Include="Histogram.cs" />

@@ -11,7 +11,7 @@ namespace HdrHistogram
         protected static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
         // "Cold" accessed fields. Not used in the recording code path:
-        protected long identity;
+        protected internal long identity;
         protected volatile bool autoResize = false;
 
         protected long highestTrackableValue;
