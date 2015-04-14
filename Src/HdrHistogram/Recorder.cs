@@ -30,7 +30,7 @@ namespace HdrHistogram
     public class Recorder
     {
         private static readonly long factor = 1000L / Stopwatch.Frequency;
-        private static long CurentTimeInMilis()
+        public static long CurentTimeInMilis()
         {
             return Stopwatch.GetTimestamp() * factor;
         }
