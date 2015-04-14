@@ -4,20 +4,16 @@
 // Ported to .NET by Iulian Margarintescu under the same license and terms as the java version
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace HdrHistogram
 {
-    
-/**
- * A base class for all encodable (and decodable) histogram classes. Log readers and writers
- * will generally use this base class to provide common log processing across the integer value
- * based AbstractHistogram subclasses and the double value based DoubleHistogram class.
- *
- */
+
+    /**
+     * A base class for all encodable (and decodable) histogram classes. Log readers and writers
+     * will generally use this base class to provide common log processing across the integer value
+     * based AbstractHistogram subclasses and the double value based DoubleHistogram class.
+     *
+     */
 
     public abstract class EncodableHistogram
     {
