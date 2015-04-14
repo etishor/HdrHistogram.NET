@@ -128,8 +128,8 @@ Target "All" DoNothing
   ==> "AssemblyInfo"
   ==> "Build"
   ==> "RunTests"
-  ==> "NuGet"
-  ==> "SourceNuGet"
+//  ==> "NuGet"
+//  ==> "SourceNuGet"
   ==> "All"
 
 RunTargetOrDefault "All"

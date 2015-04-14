@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.cmd = build.cmd
 		build.fsx = build.fsx
 		CHANGELOG.md = CHANGELOG.md
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HdrHistogram.TestConsole", "Tests\HdrHistogram.TestConsole\HdrHistogram.TestConsole.csproj", "{28372B9C-A7A7-41FF-88BF-ACC3C5E896D0}"
