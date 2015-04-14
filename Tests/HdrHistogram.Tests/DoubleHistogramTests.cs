@@ -100,7 +100,7 @@ namespace HdrHistogram.Tests
                     topValue *= 2.0;
                 }
             }
-            catch (IndexOutOfRangeException ex)
+            catch (IndexOutOfRangeException)
             {
             }
             assertEquals(1L << 33, topValue, 0.00001);
@@ -118,7 +118,7 @@ namespace HdrHistogram.Tests
                     bottomValue /= 2.0;
                 }
             }
-            catch (IndexOutOfRangeException ex)
+            catch (IndexOutOfRangeException)
             {
                 Trace.WriteLine("Bottom value at exception point = " + bottomValue);
             }
@@ -216,7 +216,7 @@ namespace HdrHistogram.Tests
                 // This should throw:
                 histogram.add(biggerOther);
             }
-            catch (IndexOutOfRangeException e)
+            catch (IndexOutOfRangeException)
             {
                 Assert.True(false, "Should of thown with out of bounds error");
             }
@@ -232,7 +232,7 @@ namespace HdrHistogram.Tests
                 biggerOther.add(histogram);
                 Assert.True(false, "Should of thown with out of bounds error");
             }
-            catch (IndexOutOfRangeException e)
+            catch (IndexOutOfRangeException)
             {
             }
         }
