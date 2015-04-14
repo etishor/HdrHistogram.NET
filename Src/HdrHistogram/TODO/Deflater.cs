@@ -17,7 +17,6 @@ namespace HdrHistogram
 
         public Deflater(int compressionLevel)
         {
-            // TODO: Complete member initialization
             this.compressionLevel = compressionLevel;
         }
 

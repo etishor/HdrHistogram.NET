@@ -348,6 +348,7 @@ namespace HdrHistogram.Tests
             testRawRecordingSpeedAtExpectedInterval("AtomicHistogram: ", histogram, 1000000000, concurrentTimingLoopCount);
         }
 
+        [Fact]
         public void testLeadingZerosSpeed()
         {
             Console.WriteLine("\nTiming LeadingZerosSpeed :");

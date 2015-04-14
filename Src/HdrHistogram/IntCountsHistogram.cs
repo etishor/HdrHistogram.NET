@@ -139,9 +139,7 @@ namespace HdrHistogram
 
             int countsDelta = countsArrayLength - counts.Length;
 
-            // TODO: check if this is correct
             Array.Resize(ref counts, countsArrayLength);
-            //counts = Arrays.copyOf(counts, countsArrayLength);
 
             if (oldNormalizedZeroIndex != 0)
             {
