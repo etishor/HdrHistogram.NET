@@ -77,6 +77,7 @@
     <Compile Include="IntCountsHistogram.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="ShortCountsHistogram.cs" />
+    <Compile Include="SingleWriterDoubleRecorder.cs" />
     <Compile Include="SingleWriterRecorder.cs" />
     <Compile Include="SynchronizedDoubleHistogram.cs" />
     <Compile Include="SynchronizedHistogram.cs" />

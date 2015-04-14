@@ -66,6 +66,7 @@
     <Compile Include="DoubleHistogramTests.cs" />
     <Compile Include="HistogramAutosizingTests.cs" />
     <Compile Include="HistogramDataAccessTests.cs" />
+    <Compile Include="HistogramPerfTest.cs" />
     <Compile Include="HistogramShiftTests.cs" />
     <Compile Include="HistogramTests.cs" />
     <Compile Include="MathUtilsTests.cs" />
