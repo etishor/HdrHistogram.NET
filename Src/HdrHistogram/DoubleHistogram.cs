@@ -6,6 +6,7 @@
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace HdrHistogram
@@ -111,7 +112,7 @@ namespace HdrHistogram
      * @param internalCountsHistogramClass The class to use for internal counts tracking
      */
 
-        protected DoubleHistogram(long highestToLowestValueRatio,
+        internal protected DoubleHistogram(long highestToLowestValueRatio,
             int numberOfSignificantValueDigits,
             Type internalCountsHistogramClass)
             : this(highestToLowestValueRatio, numberOfSignificantValueDigits, internalCountsHistogramClass, null)
@@ -156,51 +157,59 @@ namespace HdrHistogram
                     " Use ConcurrentHistogram instead.");
             }
 
-            long integerValueRange = deriveIntegerValueRange(highestToLowestValueRatio, numberOfSignificantValueDigits);
-
-            AbstractHistogram valuesHistogram;
-            double initialLowestValueInAutoRange;
-
-            if (internalCountsHistogram == null)
+            try
             {
-                var histogramConstructor = internalCountsHistogramClass.GetConstructor(new[] { typeof(long), typeof(long), typeof(int) });
-                valuesHistogram = histogramConstructor.Invoke(new object[] { 1L, (integerValueRange - 1), numberOfSignificantValueDigits })
-                    as AbstractHistogram;
 
-                // We want the auto-ranging to tend towards using a value range that will result in using the
-                // lower tracked value ranges and leave the higher end empty unless the range is actually used.
-                // This is most easily done by making early recordings force-shift the lower value limit to
-                // accommodate them (forcing a force-shift for the higher values would achieve the opposite).
-                // We will therefore start with a very high value range, and let the recordings autoAdjust
-                // downwards from there:
-                initialLowestValueInAutoRange = Math.Pow(2.0, 800);
-            }
-            else if (mimicInternalModel)
-            {
-                var histogramConstructor = internalCountsHistogramClass.GetConstructor(new[] { typeof(AbstractHistogram) });
-                valuesHistogram = histogramConstructor.Invoke(new object[] { internalCountsHistogram })
-                    as AbstractHistogram;
+                long integerValueRange = deriveIntegerValueRange(highestToLowestValueRatio, numberOfSignificantValueDigits);
 
-                initialLowestValueInAutoRange = Math.Pow(2.0, 800);
-            }
-            else
-            {
-                // Verify that the histogram we got matches:
-                if ((internalCountsHistogram.getLowestDiscernibleValue() != 1) ||
-                    (internalCountsHistogram.getHighestTrackableValue() != integerValueRange - 1) ||
-                    internalCountsHistogram.getNumberOfSignificantValueDigits() != numberOfSignificantValueDigits)
+                AbstractHistogram valuesHistogram;
+                double initialLowestValueInAutoRange;
+
+                if (internalCountsHistogram == null)
                 {
-                    throw new InvalidOperationException("integer values histogram does not match stated parameters.");
-                }
-                valuesHistogram = internalCountsHistogram;
-                // Derive initialLowestValueInAutoRange from valuesHistogram's integerToDoubleValueConversionRatio:
-                initialLowestValueInAutoRange =
-                    internalCountsHistogram.getIntegerToDoubleValueConversionRatio() *
-                    internalCountsHistogram.subBucketHalfCount;
-            }
+                    var histogramConstructor = internalCountsHistogramClass.GetConstructor(new[] { typeof(long), typeof(long), typeof(int) });
+                    valuesHistogram = histogramConstructor.Invoke(new object[] { 1L, (integerValueRange - 1), numberOfSignificantValueDigits })
+                        as AbstractHistogram;
 
-            // Set our double tracking range and internal histogram:
-            init(highestToLowestValueRatio, initialLowestValueInAutoRange, valuesHistogram);
+                    // We want the auto-ranging to tend towards using a value range that will result in using the
+                    // lower tracked value ranges and leave the higher end empty unless the range is actually used.
+                    // This is most easily done by making early recordings force-shift the lower value limit to
+                    // accommodate them (forcing a force-shift for the higher values would achieve the opposite).
+                    // We will therefore start with a very high value range, and let the recordings autoAdjust
+                    // downwards from there:
+                    initialLowestValueInAutoRange = Math.Pow(2.0, 800);
+                }
+                else if (mimicInternalModel)
+                {
+                    var histogramConstructor = internalCountsHistogramClass.GetConstructor(new[] { typeof(AbstractHistogram) });
+                    valuesHistogram = histogramConstructor.Invoke(new object[] { internalCountsHistogram })
+                        as AbstractHistogram;
+
+                    initialLowestValueInAutoRange = Math.Pow(2.0, 800);
+                }
+                else
+                {
+                    // Verify that the histogram we got matches:
+                    if ((internalCountsHistogram.getLowestDiscernibleValue() != 1) ||
+                        (internalCountsHistogram.getHighestTrackableValue() != integerValueRange - 1) ||
+                        internalCountsHistogram.getNumberOfSignificantValueDigits() != numberOfSignificantValueDigits)
+                    {
+                        throw new InvalidOperationException("integer values histogram does not match stated parameters.");
+                    }
+                    valuesHistogram = internalCountsHistogram;
+                    // Derive initialLowestValueInAutoRange from valuesHistogram's integerToDoubleValueConversionRatio:
+                    initialLowestValueInAutoRange =
+                        internalCountsHistogram.getIntegerToDoubleValueConversionRatio() *
+                        internalCountsHistogram.subBucketHalfCount;
+                }
+
+                // Set our double tracking range and internal histogram:
+                init(highestToLowestValueRatio, initialLowestValueInAutoRange, valuesHistogram);
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new ArgumentException("internalCountsHistogramClass", ex);
+            }
         }
 
         /**
@@ -219,8 +228,7 @@ namespace HdrHistogram
             this.autoResize = source.autoResize;
         }
 
-        private void init(long configuredHighestToLowestValueRatio, double lowestTrackableUnitValue,
-            AbstractHistogram integerValuesHistogram)
+        private void init(long configuredHighestToLowestValueRatio, double lowestTrackableUnitValue, AbstractHistogram integerValuesHistogram)
         {
             this.configuredHighestToLowestValueRatio = configuredHighestToLowestValueRatio;
             this.integerValuesHistogram = integerValuesHistogram;
@@ -847,7 +855,7 @@ namespace HdrHistogram
      * @return current lowest trackable value the automatically determined range
      */
 
-        private double getCurrentLowestTrackableNonZeroValue()
+        internal double getCurrentLowestTrackableNonZeroValue()
         {
             return currentLowestValueInAutoRange.GetValue();
         }
@@ -858,7 +866,7 @@ namespace HdrHistogram
      * @return current highest trackable value in the automatically determined range
      */
 
-        private double getCurrentHighestTrackableValue()
+        internal double getCurrentHighestTrackableValue()
         {
             return currentHighestValueLimitInAutoRange.GetValue();
         }
