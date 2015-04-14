@@ -40,5 +40,7 @@ namespace HdrHistogram
         {
             throw new NotImplementedException();
         }
+
+        public static int DEFAULT_COMPRESSION { get; set; }
     }
 }

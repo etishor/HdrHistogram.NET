@@ -14,17 +14,17 @@ namespace HdrHistogram
         protected internal long identity;
         protected volatile bool autoResize = false;
 
-        protected long highestTrackableValue;
+        internal protected long highestTrackableValue;
         protected long lowestDiscernibleValue;
-        protected int numberOfSignificantValueDigits;
+        internal protected int numberOfSignificantValueDigits;
 
         protected internal int bucketCount;
         protected int subBucketCount;
         internal int countsArrayLength;
         protected int wordSizeInBytes;
 
-        protected long startTimeStampMsec = long.MaxValue;
-        protected long endTimeStampMsec = 0;
+        internal protected long startTimeStampMsec = long.MaxValue;
+        internal protected long endTimeStampMsec = 0;
 
         protected double integerToDoubleValueConversionRatio = 1.0;
 
@@ -37,7 +37,7 @@ namespace HdrHistogram
             return integerToDoubleValueConversionRatio;
         }
 
-        protected void setIntegerToDoubleValueConversionRatio(double integerToDoubleValueConversionRatio)
+        internal protected void setIntegerToDoubleValueConversionRatio(double integerToDoubleValueConversionRatio)
         {
             this.integerToDoubleValueConversionRatio = integerToDoubleValueConversionRatio;
         }

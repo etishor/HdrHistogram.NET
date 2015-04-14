@@ -43,7 +43,7 @@ namespace HdrHistogram
          *         been called after the last call to the {@code next}
          *         method
          */
-        protected abstract void remove();
+        protected internal abstract void remove();
 
 
         public E Current { get; private set; }

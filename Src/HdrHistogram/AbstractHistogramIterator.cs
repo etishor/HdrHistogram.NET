@@ -32,7 +32,7 @@ namespace HdrHistogram
         protected long countAtThisValue;
 
         private bool freshSubBucket;
-        HistogramIterationValue currentIterationValue = new HistogramIterationValue();
+        internal HistogramIterationValue currentIterationValue = new HistogramIterationValue();
 
         private double integerToDoubleValueConversionRatio;
 
@@ -115,7 +115,7 @@ namespace HdrHistogram
          * Not supported. Will throw an {@link UnsupportedOperationException}.
          */
 
-        protected override void remove()
+        internal protected override void remove()
         {
             throw new NotSupportedException();
         }

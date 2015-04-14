@@ -56,9 +56,9 @@ namespace HdrHistogram
         // that they will have a good chance of ending up in the same cache line as the totalCounts and
         // counts array reference fields that subclass implementations will typically add.
         int leadingZeroCountBase;
-        protected int subBucketHalfCountMagnitude;
+        internal protected int subBucketHalfCountMagnitude;
         internal int unitMagnitude;
-        protected int subBucketHalfCount;
+        internal protected int subBucketHalfCount;
         long subBucketMask;
         AtomicLong maxValue = new AtomicLong(0);
         AtomicLong minNonZeroValue = new AtomicLong(long.MaxValue);
@@ -98,9 +98,9 @@ namespace HdrHistogram
 
         protected abstract void addToTotalCount(long value);
 
-        protected abstract void clearCounts();
+        internal protected abstract void clearCounts();
 
-        protected abstract int _getEstimatedFootprintInBytes();
+        internal protected abstract int _getEstimatedFootprintInBytes();
 
         protected internal abstract void resize(long newHighestTrackableValue);
 
@@ -1672,7 +1672,7 @@ namespace HdrHistogram
         //
         //
 
-        private void writeObject(BinaryWriter o)
+        internal protected void writeObject(BinaryWriter o)
         {
             o.Write(lowestDiscernibleValue);
             o.Write(highestTrackableValue);
@@ -1736,7 +1736,7 @@ namespace HdrHistogram
         private static int ENCODING_HEADER_SIZE = 40;
         private static int V0_ENCODING_HEADER_SIZE = 32;
 
-        int getNeededByteBufferCapacity(int relevantLength)
+        internal int getNeededByteBufferCapacity(int relevantLength)
         {
             return getNeededPayloadByteBufferCapacity(relevantLength) + ENCODING_HEADER_SIZE;
         }
@@ -1746,9 +1746,9 @@ namespace HdrHistogram
             return (relevantLength * wordSizeInBytes);
         }
 
-        protected abstract void fillCountsArrayFromBuffer(ByteBuffer buffer, int length);
+        internal protected abstract void fillCountsArrayFromBuffer(ByteBuffer buffer, int length);
 
-        protected abstract void fillBufferFromCountsArray(ByteBuffer buffer, int length);
+        internal protected abstract void fillBufferFromCountsArray(ByteBuffer buffer, int length);
 
         private static int V0EncodingCookieBase = 0x1c849308;
         private static int V0EcompressedEncodingCookieBase = 0x1c849309;
@@ -2092,7 +2092,7 @@ namespace HdrHistogram
             setTotalCount(observedTotalCount);
         }
 
-        int getBucketsNeededToCoverValue(long value)
+        internal int getBucketsNeededToCoverValue(long value)
         {
             long smallestUntrackableValue = ((long)subBucketCount) << unitMagnitude;
             int bucketsNeeded = 1;
@@ -2108,7 +2108,7 @@ namespace HdrHistogram
             return bucketsNeeded;
         }
 
-        int getLengthForNumberOfBuckets(int numberOfBuckets)
+        internal int getLengthForNumberOfBuckets(int numberOfBuckets)
         {
             int lengthNeeded = (numberOfBuckets + 1) * (subBucketCount / 2);
             return lengthNeeded;
@@ -2193,7 +2193,7 @@ namespace HdrHistogram
             return valueFromIndex(bucketIndex, subBucketIndex);
         }
 
-        static int numberOfSubbuckets(int numberOfSignificantValueDigits)
+        internal static int numberOfSubbuckets(int numberOfSignificantValueDigits)
         {
             long largestValueWithSingleUnitResolution = 2 * (long)Math.Pow(10, numberOfSignificantValueDigits);
 

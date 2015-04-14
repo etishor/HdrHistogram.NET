@@ -10,6 +10,7 @@
 // **/
 // 
 using System;
+using System.Diagnostics;
 using FluentAssertions;
 using Xunit;
 
@@ -28,6 +29,26 @@ namespace HdrHistogram.Tests
         private static readonly long highestTrackableValue = 3600L * 1000 * 1000; // e.g. for 1 hr in usec units
         private static readonly int numberOfSignificantValueDigits = 3;
         private static readonly long testValueLevel = 4;
+
+        private void assertEqual(AbstractHistogram expectedHistogram, AbstractHistogram actualHistogram)
+        {
+            actualHistogram.Equals(expectedHistogram).Should().BeTrue();
+
+            Assert.Equal(
+                    expectedHistogram.getCountAtValue(testValueLevel),
+                    actualHistogram.getCountAtValue(testValueLevel));
+
+            Assert.Equal(
+                    expectedHistogram.getCountAtValue(testValueLevel * 10),
+                    actualHistogram.getCountAtValue(testValueLevel * 10));
+
+            Assert.Equal(
+                    expectedHistogram.getTotalCount(),
+                    actualHistogram.getTotalCount());
+
+            verifyMaxValue(expectedHistogram);
+            verifyMaxValue(actualHistogram);
+        }
 
         private static void verifyMaxValue(AbstractHistogram histogram)
         {
@@ -432,11 +453,329 @@ namespace HdrHistogram.Tests
             verifyMaxValue(histogram);
         }
 
-        //    [Fact]
-        //    public void testNextNonEquivalentValue() {
-        //        Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        Assert.assertNotSame(null, histogram);
-        //    }
+        [Fact]
+        public void testNextNonEquivalentValue()
+        {
+            Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
+            histogram.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void testOverflow()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                ShortCountsHistogram histogram = new ShortCountsHistogram(highestTrackableValue, 2);
+                histogram.recordValue(testValueLevel);
+                histogram.recordValue(testValueLevel * 10);
+                // This should overflow a ShortHistogram:
+                histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 500);
+            });
+        }
+
+        [Fact]
+        public void testCopy()
+        {
+            Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
+            histogram.recordValue(testValueLevel);
+            histogram.recordValue(testValueLevel * 10);
+            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of Histogram:");
+            assertEqual(histogram, histogram.copy());
+
+            IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            intCountsHistogram.recordValue(testValueLevel);
+            intCountsHistogram.recordValue(testValueLevel * 10);
+            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of IntHistogram:");
+            assertEqual(intCountsHistogram, intCountsHistogram.copy());
+
+            ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            shortCountsHistogram.recordValue(testValueLevel);
+            shortCountsHistogram.recordValue(testValueLevel * 10);
+            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of ShortHistogram:");
+            assertEqual(shortCountsHistogram, shortCountsHistogram.copy());
+
+            AtomicHistogram atomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            atomicHistogram.recordValue(testValueLevel);
+            atomicHistogram.recordValue(testValueLevel * 10);
+            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of AtomicHistogram:");
+            assertEqual(atomicHistogram, atomicHistogram.copy());
+
+            ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            concurrentHistogram.recordValue(testValueLevel);
+            concurrentHistogram.recordValue(testValueLevel * 10);
+            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of ConcurrentHistogram:");
+            assertEqual(concurrentHistogram, concurrentHistogram.copy());
+
+            SynchronizedHistogram syncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            syncHistogram.recordValue(testValueLevel);
+            syncHistogram.recordValue(testValueLevel * 10);
+            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of SynchronizedHistogram:");
+            assertEqual(syncHistogram, syncHistogram.copy());
+        }
+
+        [Fact]
+        public void testScaledCopy()
+        {
+            Histogram histogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            histogram.recordValue(testValueLevel);
+            histogram.recordValue(testValueLevel * 10);
+            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of scaled Histogram:");
+            assertEqual(histogram, histogram.copy());
+
+            IntCountsHistogram intCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            intCountsHistogram.recordValue(testValueLevel);
+            intCountsHistogram.recordValue(testValueLevel * 10);
+            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of scaled IntHistogram:");
+            assertEqual(intCountsHistogram, intCountsHistogram.copy());
+
+            ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            shortCountsHistogram.recordValue(testValueLevel);
+            shortCountsHistogram.recordValue(testValueLevel * 10);
+            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of scaled ShortHistogram:");
+            assertEqual(shortCountsHistogram, shortCountsHistogram.copy());
+
+            AtomicHistogram atomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            atomicHistogram.recordValue(testValueLevel);
+            atomicHistogram.recordValue(testValueLevel * 10);
+            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of scaled AtomicHistogram:");
+            assertEqual(atomicHistogram, atomicHistogram.copy());
+
+            ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            concurrentHistogram.recordValue(testValueLevel);
+            concurrentHistogram.recordValue(testValueLevel * 10);
+            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of scaled ConcurrentHistogram:");
+            assertEqual(concurrentHistogram, concurrentHistogram.copy());
+
+            SynchronizedHistogram syncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            syncHistogram.recordValue(testValueLevel);
+            syncHistogram.recordValue(testValueLevel * 10);
+            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copy of scaled SynchronizedHistogram:");
+            assertEqual(syncHistogram, syncHistogram.copy());
+        }
+
+        [Fact]
+        public void testCopyInto()
+        {
+            Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
+            Histogram targetHistogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
+            histogram.recordValue(testValueLevel);
+            histogram.recordValue(testValueLevel * 10);
+            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for Histogram:");
+            histogram.copyInto(targetHistogram);
+            assertEqual(histogram, targetHistogram);
+
+            histogram.recordValue(testValueLevel * 20);
+
+            histogram.copyInto(targetHistogram);
+            assertEqual(histogram, targetHistogram);
+
+
+            IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            IntCountsHistogram targetIntCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            intCountsHistogram.recordValue(testValueLevel);
+            intCountsHistogram.recordValue(testValueLevel * 10);
+            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for IntHistogram:");
+            intCountsHistogram.copyInto(targetIntCountsHistogram);
+            assertEqual(intCountsHistogram, targetIntCountsHistogram);
+
+            intCountsHistogram.recordValue(testValueLevel * 20);
+
+            intCountsHistogram.copyInto(targetIntCountsHistogram);
+            assertEqual(intCountsHistogram, targetIntCountsHistogram);
+
+
+            ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            ShortCountsHistogram targetShortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            shortCountsHistogram.recordValue(testValueLevel);
+            shortCountsHistogram.recordValue(testValueLevel * 10);
+            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for ShortHistogram:");
+            shortCountsHistogram.copyInto(targetShortCountsHistogram);
+            assertEqual(shortCountsHistogram, targetShortCountsHistogram);
+
+            shortCountsHistogram.recordValue(testValueLevel * 20);
+
+            shortCountsHistogram.copyInto(targetShortCountsHistogram);
+            assertEqual(shortCountsHistogram, targetShortCountsHistogram);
+
+
+            AtomicHistogram atomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            AtomicHistogram targetAtomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            atomicHistogram.recordValue(testValueLevel);
+            atomicHistogram.recordValue(testValueLevel * 10);
+            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for AtomicHistogram:");
+            atomicHistogram.copyInto(targetAtomicHistogram);
+            assertEqual(atomicHistogram, targetAtomicHistogram);
+
+            atomicHistogram.recordValue(testValueLevel * 20);
+
+            atomicHistogram.copyInto(targetAtomicHistogram);
+            assertEqual(atomicHistogram, targetAtomicHistogram);
+
+
+            ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            ConcurrentHistogram targetConcurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            concurrentHistogram.recordValue(testValueLevel);
+            concurrentHistogram.recordValue(testValueLevel * 10);
+            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for ConcurrentHistogram:");
+            concurrentHistogram.copyInto(targetConcurrentHistogram);
+            assertEqual(concurrentHistogram, targetConcurrentHistogram);
+
+            concurrentHistogram.recordValue(testValueLevel * 20);
+
+            concurrentHistogram.copyInto(targetConcurrentHistogram);
+            assertEqual(concurrentHistogram, targetConcurrentHistogram);
+
+
+            SynchronizedHistogram syncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            SynchronizedHistogram targetSyncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+            syncHistogram.recordValue(testValueLevel);
+            syncHistogram.recordValue(testValueLevel * 10);
+            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for SynchronizedHistogram:");
+            syncHistogram.copyInto(targetSyncHistogram);
+            assertEqual(syncHistogram, targetSyncHistogram);
+
+            syncHistogram.recordValue(testValueLevel * 20);
+
+            syncHistogram.copyInto(targetSyncHistogram);
+            assertEqual(syncHistogram, targetSyncHistogram);
+        }
+
+        [Fact]
+        public void testScaledCopyInto()
+        {
+            Histogram histogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            Histogram targetHistogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            histogram.recordValue(testValueLevel);
+            histogram.recordValue(testValueLevel * 10);
+            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for scaled Histogram:");
+            histogram.copyInto(targetHistogram);
+            assertEqual(histogram, targetHistogram);
+
+            histogram.recordValue(testValueLevel * 20);
+
+            histogram.copyInto(targetHistogram);
+            assertEqual(histogram, targetHistogram);
+
+
+            IntCountsHistogram intCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            IntCountsHistogram targetIntCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            intCountsHistogram.recordValue(testValueLevel);
+            intCountsHistogram.recordValue(testValueLevel * 10);
+            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for scaled IntHistogram:");
+            intCountsHistogram.copyInto(targetIntCountsHistogram);
+            assertEqual(intCountsHistogram, targetIntCountsHistogram);
+
+            intCountsHistogram.recordValue(testValueLevel * 20);
+
+            intCountsHistogram.copyInto(targetIntCountsHistogram);
+            assertEqual(intCountsHistogram, targetIntCountsHistogram);
+
+
+            ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            ShortCountsHistogram targetShortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            shortCountsHistogram.recordValue(testValueLevel);
+            shortCountsHistogram.recordValue(testValueLevel * 10);
+            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for scaled ShortHistogram:");
+            shortCountsHistogram.copyInto(targetShortCountsHistogram);
+            assertEqual(shortCountsHistogram, targetShortCountsHistogram);
+
+            shortCountsHistogram.recordValue(testValueLevel * 20);
+
+            shortCountsHistogram.copyInto(targetShortCountsHistogram);
+            assertEqual(shortCountsHistogram, targetShortCountsHistogram);
+
+
+            AtomicHistogram atomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            AtomicHistogram targetAtomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            atomicHistogram.recordValue(testValueLevel);
+            atomicHistogram.recordValue(testValueLevel * 10);
+            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+
+            atomicHistogram.copyInto(targetAtomicHistogram);
+            assertEqual(atomicHistogram, targetAtomicHistogram);
+
+            atomicHistogram.recordValue(testValueLevel * 20);
+
+            Trace.WriteLine("Testing copyInto for scaled AtomicHistogram:");
+            atomicHistogram.copyInto(targetAtomicHistogram);
+            assertEqual(atomicHistogram, targetAtomicHistogram);
+
+
+            ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            ConcurrentHistogram targetConcurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            concurrentHistogram.recordValue(testValueLevel);
+            concurrentHistogram.recordValue(testValueLevel * 10);
+            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+
+            concurrentHistogram.copyInto(targetConcurrentHistogram);
+            assertEqual(concurrentHistogram, targetConcurrentHistogram);
+
+            concurrentHistogram.recordValue(testValueLevel * 20);
+
+            Trace.WriteLine("Testing copyInto for scaled ConcurrentHistogram:");
+            concurrentHistogram.copyInto(targetConcurrentHistogram);
+            assertEqual(concurrentHistogram, targetConcurrentHistogram);
+
+
+            SynchronizedHistogram syncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            SynchronizedHistogram targetSyncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
+            syncHistogram.recordValue(testValueLevel);
+            syncHistogram.recordValue(testValueLevel * 10);
+            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+
+            Trace.WriteLine("Testing copyInto for scaled SynchronizedHistogram:");
+            syncHistogram.copyInto(targetSyncHistogram);
+            assertEqual(syncHistogram, targetSyncHistogram);
+
+            syncHistogram.recordValue(testValueLevel * 20);
+
+            syncHistogram.copyInto(targetSyncHistogram);
+            assertEqual(syncHistogram, targetSyncHistogram);
+        }
+
+        // TODO: serialization tests
 
         //    void testAbstractSerialization(AbstractHistogram histogram){
         //        histogram.recordValue(testValueLevel);
@@ -473,21 +812,6 @@ namespace HdrHistogram.Tests
         //        assertEqual(histogram, newHistogram);
         //    }
 
-        //    private void assertEqual(AbstractHistogram expectedHistogram, AbstractHistogram actualHistogram) {
-        //        Assert.Equal(expectedHistogram, actualHistogram);
-        //        Assert.Equal(
-        //                expectedHistogram.getCountAtValue(testValueLevel),
-        //                actualHistogram.getCountAtValue(testValueLevel));
-        //        Assert.Equal(
-        //                expectedHistogram.getCountAtValue(testValueLevel * 10),
-        //                actualHistogram.getCountAtValue(testValueLevel * 10));
-        //        Assert.Equal(
-        //                expectedHistogram.getTotalCount(),
-        //                actualHistogram.getTotalCount());
-        //        verifyMaxValue(expectedHistogram);
-        //        verifyMaxValue(actualHistogram);
-        //    }
-
         //    [Fact]
         //    public void testSerialization(){
         //        Histogram histogram = new Histogram(highestTrackableValue, 3);
@@ -503,324 +827,5 @@ namespace HdrHistogram.Tests
         //        shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, 4); // With 2 decimal points, shorts overflow here
         //        testAbstractSerialization(shortCountsHistogram);
         //    }
-
-        //    [Fact](expected = IllegalStateException.class)
-        //    public void testOverflow(){
-        //        ShortCountsHistogram histogram = new ShortCountsHistogram(highestTrackableValue, 2);
-        //        histogram.recordValue(testValueLevel);
-        //        histogram.recordValue(testValueLevel * 10);
-        //        // This should overflow a ShortHistogram:
-        //        histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 500);
-        //    }
-
-        //    [Fact]
-        //    public void testCopy(){
-        //        Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        histogram.recordValue(testValueLevel);
-        //        histogram.recordValue(testValueLevel * 10);
-        //        histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of Histogram:");
-        //        assertEqual(histogram, histogram.copy());
-
-        //        IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        intCountsHistogram.recordValue(testValueLevel);
-        //        intCountsHistogram.recordValue(testValueLevel * 10);
-        //        intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of IntHistogram:");
-        //        assertEqual(intCountsHistogram, intCountsHistogram.copy());
-
-        //        ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        shortCountsHistogram.recordValue(testValueLevel);
-        //        shortCountsHistogram.recordValue(testValueLevel * 10);
-        //        shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of ShortHistogram:");
-        //        assertEqual(shortCountsHistogram, shortCountsHistogram.copy());
-
-        //        AtomicHistogram atomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        atomicHistogram.recordValue(testValueLevel);
-        //        atomicHistogram.recordValue(testValueLevel * 10);
-        //        atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of AtomicHistogram:");
-        //        assertEqual(atomicHistogram, atomicHistogram.copy());
-
-        //        ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        concurrentHistogram.recordValue(testValueLevel);
-        //        concurrentHistogram.recordValue(testValueLevel * 10);
-        //        concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of ConcurrentHistogram:");
-        //        assertEqual(concurrentHistogram, concurrentHistogram.copy());
-
-        //        SynchronizedHistogram syncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        syncHistogram.recordValue(testValueLevel);
-        //        syncHistogram.recordValue(testValueLevel * 10);
-        //        syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of SynchronizedHistogram:");
-        //        assertEqual(syncHistogram, syncHistogram.copy());
-        //    }
-
-        //    [Fact]
-        //    public void testScaledCopy(){
-        //        Histogram histogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        histogram.recordValue(testValueLevel);
-        //        histogram.recordValue(testValueLevel * 10);
-        //        histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of scaled Histogram:");
-        //        assertEqual(histogram, histogram.copy());
-
-        //        IntCountsHistogram intCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        intCountsHistogram.recordValue(testValueLevel);
-        //        intCountsHistogram.recordValue(testValueLevel * 10);
-        //        intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of scaled IntHistogram:");
-        //        assertEqual(intCountsHistogram, intCountsHistogram.copy());
-
-        //        ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        shortCountsHistogram.recordValue(testValueLevel);
-        //        shortCountsHistogram.recordValue(testValueLevel * 10);
-        //        shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of scaled ShortHistogram:");
-        //        assertEqual(shortCountsHistogram, shortCountsHistogram.copy());
-
-        //        AtomicHistogram atomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        atomicHistogram.recordValue(testValueLevel);
-        //        atomicHistogram.recordValue(testValueLevel * 10);
-        //        atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of scaled AtomicHistogram:");
-        //        assertEqual(atomicHistogram, atomicHistogram.copy());
-
-        //        ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        concurrentHistogram.recordValue(testValueLevel);
-        //        concurrentHistogram.recordValue(testValueLevel * 10);
-        //        concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of scaled ConcurrentHistogram:");
-        //        assertEqual(concurrentHistogram, concurrentHistogram.copy());
-
-        //        SynchronizedHistogram syncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        syncHistogram.recordValue(testValueLevel);
-        //        syncHistogram.recordValue(testValueLevel * 10);
-        //        syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copy of scaled SynchronizedHistogram:");
-        //        assertEqual(syncHistogram, syncHistogram.copy());
-        //    }
-
-        //    [Fact]
-        //    public void testCopyInto(){
-        //        Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        Histogram targetHistogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        histogram.recordValue(testValueLevel);
-        //        histogram.recordValue(testValueLevel * 10);
-        //        histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for Histogram:");
-        //        histogram.copyInto(targetHistogram);
-        //        assertEqual(histogram, targetHistogram);
-
-        //        histogram.recordValue(testValueLevel * 20);
-
-        //        histogram.copyInto(targetHistogram);
-        //        assertEqual(histogram, targetHistogram);
-
-
-        //        IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        IntCountsHistogram targetIntCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        intCountsHistogram.recordValue(testValueLevel);
-        //        intCountsHistogram.recordValue(testValueLevel * 10);
-        //        intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for IntHistogram:");
-        //        intCountsHistogram.copyInto(targetIntCountsHistogram);
-        //        assertEqual(intCountsHistogram, targetIntCountsHistogram);
-
-        //        intCountsHistogram.recordValue(testValueLevel * 20);
-
-        //        intCountsHistogram.copyInto(targetIntCountsHistogram);
-        //        assertEqual(intCountsHistogram, targetIntCountsHistogram);
-
-
-        //        ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        ShortCountsHistogram targetShortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        shortCountsHistogram.recordValue(testValueLevel);
-        //        shortCountsHistogram.recordValue(testValueLevel * 10);
-        //        shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for ShortHistogram:");
-        //        shortCountsHistogram.copyInto(targetShortCountsHistogram);
-        //        assertEqual(shortCountsHistogram, targetShortCountsHistogram);
-
-        //        shortCountsHistogram.recordValue(testValueLevel * 20);
-
-        //        shortCountsHistogram.copyInto(targetShortCountsHistogram);
-        //        assertEqual(shortCountsHistogram, targetShortCountsHistogram);
-
-
-        //        AtomicHistogram atomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        AtomicHistogram targetAtomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        atomicHistogram.recordValue(testValueLevel);
-        //        atomicHistogram.recordValue(testValueLevel * 10);
-        //        atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for AtomicHistogram:");
-        //        atomicHistogram.copyInto(targetAtomicHistogram);
-        //        assertEqual(atomicHistogram, targetAtomicHistogram);
-
-        //        atomicHistogram.recordValue(testValueLevel * 20);
-
-        //        atomicHistogram.copyInto(targetAtomicHistogram);
-        //        assertEqual(atomicHistogram, targetAtomicHistogram);
-
-
-        //        ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        ConcurrentHistogram targetConcurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        concurrentHistogram.recordValue(testValueLevel);
-        //        concurrentHistogram.recordValue(testValueLevel * 10);
-        //        concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for ConcurrentHistogram:");
-        //        concurrentHistogram.copyInto(targetConcurrentHistogram);
-        //        assertEqual(concurrentHistogram, targetConcurrentHistogram);
-
-        //        concurrentHistogram.recordValue(testValueLevel * 20);
-
-        //        concurrentHistogram.copyInto(targetConcurrentHistogram);
-        //        assertEqual(concurrentHistogram, targetConcurrentHistogram);
-
-
-        //        SynchronizedHistogram syncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        SynchronizedHistogram targetSyncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-        //        syncHistogram.recordValue(testValueLevel);
-        //        syncHistogram.recordValue(testValueLevel * 10);
-        //        syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for SynchronizedHistogram:");
-        //        syncHistogram.copyInto(targetSyncHistogram);
-        //        assertEqual(syncHistogram, targetSyncHistogram);
-
-        //        syncHistogram.recordValue(testValueLevel * 20);
-
-        //        syncHistogram.copyInto(targetSyncHistogram);
-        //        assertEqual(syncHistogram, targetSyncHistogram);
-        //    }
-
-        //    [Fact]
-        //    public void testScaledCopyInto(){
-        //        Histogram histogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        Histogram targetHistogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        histogram.recordValue(testValueLevel);
-        //        histogram.recordValue(testValueLevel * 10);
-        //        histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for scaled Histogram:");
-        //        histogram.copyInto(targetHistogram);
-        //        assertEqual(histogram, targetHistogram);
-
-        //        histogram.recordValue(testValueLevel * 20);
-
-        //        histogram.copyInto(targetHistogram);
-        //        assertEqual(histogram, targetHistogram);
-
-
-        //        IntCountsHistogram intCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        IntCountsHistogram targetIntCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        intCountsHistogram.recordValue(testValueLevel);
-        //        intCountsHistogram.recordValue(testValueLevel * 10);
-        //        intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for scaled IntHistogram:");
-        //        intCountsHistogram.copyInto(targetIntCountsHistogram);
-        //        assertEqual(intCountsHistogram, targetIntCountsHistogram);
-
-        //        intCountsHistogram.recordValue(testValueLevel * 20);
-
-        //        intCountsHistogram.copyInto(targetIntCountsHistogram);
-        //        assertEqual(intCountsHistogram, targetIntCountsHistogram);
-
-
-        //        ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        ShortCountsHistogram targetShortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        shortCountsHistogram.recordValue(testValueLevel);
-        //        shortCountsHistogram.recordValue(testValueLevel * 10);
-        //        shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for scaled ShortHistogram:");
-        //        shortCountsHistogram.copyInto(targetShortCountsHistogram);
-        //        assertEqual(shortCountsHistogram, targetShortCountsHistogram);
-
-        //        shortCountsHistogram.recordValue(testValueLevel * 20);
-
-        //        shortCountsHistogram.copyInto(targetShortCountsHistogram);
-        //        assertEqual(shortCountsHistogram, targetShortCountsHistogram);
-
-
-        //        AtomicHistogram atomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        AtomicHistogram targetAtomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        atomicHistogram.recordValue(testValueLevel);
-        //        atomicHistogram.recordValue(testValueLevel * 10);
-        //        atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        atomicHistogram.copyInto(targetAtomicHistogram);
-        //        assertEqual(atomicHistogram, targetAtomicHistogram);
-
-        //        atomicHistogram.recordValue(testValueLevel * 20);
-
-        //        System.out.println("Testing copyInto for scaled AtomicHistogram:");
-        //        atomicHistogram.copyInto(targetAtomicHistogram);
-        //        assertEqual(atomicHistogram, targetAtomicHistogram);
-
-
-        //        ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        ConcurrentHistogram targetConcurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        concurrentHistogram.recordValue(testValueLevel);
-        //        concurrentHistogram.recordValue(testValueLevel * 10);
-        //        concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        concurrentHistogram.copyInto(targetConcurrentHistogram);
-        //        assertEqual(concurrentHistogram, targetConcurrentHistogram);
-
-        //        concurrentHistogram.recordValue(testValueLevel * 20);
-
-        //        System.out.println("Testing copyInto for scaled ConcurrentHistogram:");
-        //        concurrentHistogram.copyInto(targetConcurrentHistogram);
-        //        assertEqual(concurrentHistogram, targetConcurrentHistogram);
-
-
-        //        SynchronizedHistogram syncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        SynchronizedHistogram targetSyncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-        //        syncHistogram.recordValue(testValueLevel);
-        //        syncHistogram.recordValue(testValueLevel * 10);
-        //        syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
-
-        //        System.out.println("Testing copyInto for scaled SynchronizedHistogram:");
-        //        syncHistogram.copyInto(targetSyncHistogram);
-        //        assertEqual(syncHistogram, targetSyncHistogram);
-
-        //        syncHistogram.recordValue(testValueLevel * 20);
-
-        //        syncHistogram.copyInto(targetSyncHistogram);
-        //        assertEqual(syncHistogram, targetSyncHistogram);
-        //    }
-
-        //    public void verifyMaxValue(AbstractHistogram histogram) {
-        //        long computedMaxValue = 0;
-        //        for (int i = 0; i < histogram.countsArrayLength; i++) {
-        //            if (histogram.getCountAtIndex(i) > 0) {
-        //                computedMaxValue = histogram.valueFromIndex(i);
-        //            }
-        //        }
-        //        computedMaxValue = (computedMaxValue == 0) ? 0 : histogram.highestEquivalentValue(computedMaxValue);
-        //        Assert.Equal(computedMaxValue, histogram.getMaxValue());
-        //    }
-        //}
     }
 }

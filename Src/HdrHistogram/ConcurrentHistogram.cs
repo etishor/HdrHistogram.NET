@@ -399,7 +399,7 @@ namespace HdrHistogram
             this.autoResize = true;
         }
 
-        protected override void clearCounts()
+        protected internal override void clearCounts()
         {
             try
             {
@@ -453,7 +453,7 @@ namespace HdrHistogram
             totalCount.Add(value);
         }
 
-        protected override int _getEstimatedFootprintInBytes()
+        protected internal override int _getEstimatedFootprintInBytes()
         {
             return (512 + (2 * 8 * activeCounts.Length));
         }
@@ -566,7 +566,7 @@ namespace HdrHistogram
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void fillCountsArrayFromBuffer(ByteBuffer buffer, int length)
+        protected internal override void fillCountsArrayFromBuffer(ByteBuffer buffer, int length)
         {
             LongBuffer logbuffer = buffer.asLongBuffer();
             for (int i = 0; i < length; i++)
@@ -583,7 +583,7 @@ namespace HdrHistogram
         private int cachedDstByteBufferPosition = 0;
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void fillBufferFromCountsArray(ByteBuffer buffer, int length)
+        protected internal override void fillBufferFromCountsArray(ByteBuffer buffer, int length)
         {
             if ((cachedDstLongBuffer == null) ||
                     (buffer != cachedDstByteBuffer) ||
