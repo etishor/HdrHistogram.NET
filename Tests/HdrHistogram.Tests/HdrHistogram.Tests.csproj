@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="ConcurrentHistogramTests.cs" />
     <Compile Include="HistogramAutosizingTests.cs" />
+    <Compile Include="HistogramDataAccessTests.cs" />
     <Compile Include="HistogramShiftTests.cs" />
     <Compile Include="HistogramTests.cs" />
     <Compile Include="MathUtilsTests.cs" />
