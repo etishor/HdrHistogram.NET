@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace HdrHistogram.TestConsole
 {
     class Program
@@ -10,6 +12,10 @@ namespace HdrHistogram.TestConsole
             h.recordValue(100);
 
             var x = h.getValueAtPercentile(50);
+
+            h.OutputPercentileDistribution(Console.Out, 1000);
+
+            Console.ReadKey();
         }
     }
 }

@@ -1502,7 +1502,7 @@ namespace HdrHistogram
             Double outputValueUnitScalingRatio,
             bool useCsvFormat)
         {
-            integerValuesHistogram.outputPercentileDistribution(printStream,
+            integerValuesHistogram.OutputPercentileDistribution(printStream,
                 percentileTicksPerHalfDistance,
                 outputValueUnitScalingRatio / integerToDoubleValueConversionRatio.GetValue(),
                 useCsvFormat);

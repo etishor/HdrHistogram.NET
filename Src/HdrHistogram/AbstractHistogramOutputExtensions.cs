@@ -19,9 +19,9 @@ namespace HdrHistogram
         *                                     output
         */
 
-        public static void outputPercentileDistribution(this AbstractHistogram histogram, TextWriter printStream, double outputValueUnitScalingRatio)
+        public static void OutputPercentileDistribution(this AbstractHistogram histogram, TextWriter printStream, double outputValueUnitScalingRatio)
         {
-            outputPercentileDistribution(histogram, printStream, 5, outputValueUnitScalingRatio);
+            histogram.OutputPercentileDistribution(printStream, 5, outputValueUnitScalingRatio);
         }
 
         //
@@ -44,11 +44,11 @@ namespace HdrHistogram
          * @param outputValueUnitScalingRatio    The scaling factor by which to divide histogram recorded values units in
          *                                     output
          */
-        public static void outputPercentileDistribution(this AbstractHistogram histogram, TextWriter printStream,
+        public static void OutputPercentileDistribution(this AbstractHistogram histogram, TextWriter printStream,
                                                  int percentileTicksPerHalfDistance,
                                                  double outputValueUnitScalingRatio)
         {
-            outputPercentileDistribution(histogram, printStream, percentileTicksPerHalfDistance, outputValueUnitScalingRatio, false);
+            histogram.OutputPercentileDistribution(printStream, percentileTicksPerHalfDistance, outputValueUnitScalingRatio, false);
         }
 
         /**
@@ -64,11 +64,13 @@ namespace HdrHistogram
          *                                     output
          * @param useCsvFormat  Output in CSV format if true. Otherwise use plain text form.
          */
-        public static void outputPercentileDistribution(this AbstractHistogram histogram, TextWriter printStream,
+        public static void OutputPercentileDistribution(this AbstractHistogram histogram, TextWriter printStream,
                                                  int percentileTicksPerHalfDistance,
                                                  double outputValueUnitScalingRatio,
                                                  bool useCsvFormat)
         {
+
+            // TODO: fix format strings 
 
             if (useCsvFormat)
             {
