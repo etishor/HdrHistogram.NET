@@ -39,6 +39,8 @@ namespace HdrHistogram
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
             this.WordSizeInBytes = wordSizeInBytes;
             this.AutoResize = autoResize;
+
+            this.recordedValuesIterator = new RecordedValuesIterator(this as AbstractHistogram);
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
@@ -62,7 +64,7 @@ namespace HdrHistogram
 
         internal protected double integerToDoubleValueConversionRatio = 1.0;
 
-        protected RecordedValuesIterator recordedValuesIterator;
+        protected readonly RecordedValuesIterator recordedValuesIterator;
         protected ByteBuffer intermediateUncompressedByteBuffer = null;
     }
 }

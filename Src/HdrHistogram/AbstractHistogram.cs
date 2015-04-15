@@ -5,7 +5,6 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -229,8 +228,6 @@ namespace HdrHistogram
 
             // Establish leadingZeroCountBase, used in getBucketIndex() fast path:
             leadingZeroCountBase = 64 - unitMagnitude - subBucketHalfCountMagnitude - 1;
-
-            recordedValuesIterator = new RecordedValuesIterator(this);
         }
 
         protected void establishSize(long newHighestTrackableValue)
@@ -1357,7 +1354,7 @@ namespace HdrHistogram
                 percentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d %14.2f\n";
                 lastLinePercentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d\n";
             }
-            
+
             foreach (var iterationValue in this.Percentiles(percentileTicksPerHalfDistance))
             {
                 if (iterationValue.getPercentileLevelIteratedTo() != 100.0D)
