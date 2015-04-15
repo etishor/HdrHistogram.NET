@@ -196,7 +196,7 @@ namespace HdrHistogram
          * @param source The source histogram to duplicate
          */
         protected AbstractHistogram(AbstractHistogram source)
-            : this(source.getLowestDiscernibleValue(), source.getHighestTrackableValue(), source.getNumberOfSignificantValueDigits(), source.autoResize)
+            : this(source.getLowestDiscernibleValue(), source.getHighestTrackableValue(), source.getNumberOfSignificantValueDigits(), source.AutoResize)
         {
             this.setStartTimeStamp(source.getStartTimeStamp());
             this.setEndTimeStamp(source.getEndTimeStamp());
@@ -379,7 +379,7 @@ namespace HdrHistogram
 
         private void handleRecordException(long count, long value, Exception ex)
         {
-            if (!autoResize)
+            if (!AutoResize)
             {
                 throw new IndexOutOfRangeException("value outside of histogram covered range. Caused by: " + ex);
             }
@@ -527,7 +527,7 @@ namespace HdrHistogram
             long highestRecordableValue = highestEquivalentValue(valueFromIndex(countsArrayLength - 1));
             if (highestRecordableValue < otherHistogram.getMaxValue())
             {
-                if (!autoResize)
+                if (!AutoResize)
                 {
                     throw new IndexOutOfRangeException("The other histogram includes values that do not fit in this histogram's range.");
                 }
@@ -585,7 +585,7 @@ namespace HdrHistogram
             long highestRecordableValue = valueFromIndex(countsArrayLength - 1);
             if (highestRecordableValue < otherHistogram.getMaxValue())
             {
-                if (!autoResize)
+                if (!AutoResize)
                 {
                     throw new IndexOutOfRangeException("The other histogram includes values that do not fit in this histogram's range.");
                 }
@@ -1651,7 +1651,7 @@ namespace HdrHistogram
             o.Write(minNonZeroValue.GetValue());
             o.Write(startTimeStampMsec);
             o.Write(endTimeStampMsec);
-            o.Write(autoResize);
+            o.Write(AutoResize);
         }
 
         private void readObject(BinaryReader o)

@@ -29,14 +29,13 @@ namespace HdrHistogram
 
             this.Identity = constructionIdentityCount.GetAndIncrement();
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
-            this.autoResize = autoResize;
+            this.AutoResize = autoResize;
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
         internal protected readonly long Identity;
         internal protected readonly int NumberOfSignificantValueDigits;
-
-        protected readonly bool autoResize;
+        protected readonly bool AutoResize;
 
         internal protected long highestTrackableValue;
         protected long lowestDiscernibleValue;
