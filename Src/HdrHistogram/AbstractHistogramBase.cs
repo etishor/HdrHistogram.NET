@@ -4,6 +4,9 @@
 // Ported to .NET by Iulian Margarintescu under the same license and terms as the java version
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
+
+using System;
+
 namespace HdrHistogram
 {
     /// <summary>
@@ -17,21 +20,26 @@ namespace HdrHistogram
     {
         private static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
-        protected AbstractHistogramBase()
+        protected AbstractHistogramBase(int numberOfSignificantValueDigits)
         {
-            this.identity = constructionIdentityCount.GetAndIncrement();
+            if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5))
+            {
+                throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5");
+            }
+
+            this.Identity = constructionIdentityCount.GetAndIncrement();
+            this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
-        internal protected readonly long identity;
-
+        internal protected readonly long Identity;
+        internal protected readonly int NumberOfSignificantValueDigits;
 
         protected volatile bool autoResize = false;
 
         internal protected long highestTrackableValue;
         protected long lowestDiscernibleValue;
-        internal protected int numberOfSignificantValueDigits;
-
+        
         protected internal int bucketCount;
         protected int subBucketCount;
         internal int countsArrayLength;

@@ -35,7 +35,7 @@ namespace HdrHistogram
         public override int GetHashCode()
         {
             // compiler warns if equals is implemented without GetHashCode()
-            return base.identity.GetHashCode();
+            return base.Identity.GetHashCode();
         }
 
         private static readonly CultureInfo usCulture = CultureInfo.CreateSpecificCulture("en-US");
@@ -177,6 +177,7 @@ namespace HdrHistogram
          *                                       integer between 0 and 5.
          */
         protected AbstractHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
+            : base(numberOfSignificantValueDigits)
         {
             // Verify argument validity
             if (lowestDiscernibleValue < 1)
@@ -187,12 +188,8 @@ namespace HdrHistogram
             {
                 throw new ArgumentException("highestTrackableValue must be >= 2 * lowestDiscernibleValue");
             }
-            if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5))
-            {
-                throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5");
-            }
 
-            init(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, 1.0, 0);
+            init(lowestDiscernibleValue, highestTrackableValue, 1.0, 0);
         }
 
         /**
@@ -210,20 +207,18 @@ namespace HdrHistogram
 
         private void init(long lowestDiscernibleValue,
                           long highestTrackableValue,
-                          int numberOfSignificantValueDigits,
                           double integerToDoubleValueConversionRatio,
                           int normalizingIndexOffset)
         {
             this.lowestDiscernibleValue = lowestDiscernibleValue;
             this.highestTrackableValue = highestTrackableValue;
-            this.numberOfSignificantValueDigits = numberOfSignificantValueDigits;
             this.integerToDoubleValueConversionRatio = integerToDoubleValueConversionRatio;
             if (normalizingIndexOffset != 0)
             {
                 setNormalizingIndexOffset(normalizingIndexOffset);
             }
 
-            long largestValueWithSingleUnitResolution = 2 * (long)Math.Pow(10, numberOfSignificantValueDigits);
+            long largestValueWithSingleUnitResolution = 2 * (long)Math.Pow(10, NumberOfSignificantValueDigits);
 
             unitMagnitude = (int)Math.Floor(Math.Log(lowestDiscernibleValue) / Math.Log(2));
 
@@ -901,7 +896,7 @@ namespace HdrHistogram
             AbstractHistogram that = (AbstractHistogram)other;
             if ((lowestDiscernibleValue != that.lowestDiscernibleValue) ||
                 (highestTrackableValue != that.highestTrackableValue) ||
-                (numberOfSignificantValueDigits != that.numberOfSignificantValueDigits) ||
+                (NumberOfSignificantValueDigits != that.NumberOfSignificantValueDigits) ||
                 (integerToDoubleValueConversionRatio != that.integerToDoubleValueConversionRatio))
             {
                 return false;
@@ -956,7 +951,7 @@ namespace HdrHistogram
          */
         public int getNumberOfSignificantValueDigits()
         {
-            return numberOfSignificantValueDigits;
+            return NumberOfSignificantValueDigits;
         }
 
         /**
@@ -1595,13 +1590,13 @@ namespace HdrHistogram
             String lastLinePercentileFormatString;
             if (useCsvFormat)
             {
-                percentileFormatString = "%." + numberOfSignificantValueDigits + "f,%.12f,%d,%.2f\n";
-                lastLinePercentileFormatString = "%." + numberOfSignificantValueDigits + "f,%.12f,%d,Infinity\n";
+                percentileFormatString = "%." + NumberOfSignificantValueDigits + "f,%.12f,%d,%.2f\n";
+                lastLinePercentileFormatString = "%." + NumberOfSignificantValueDigits + "f,%.12f,%d,Infinity\n";
             }
             else
             {
-                percentileFormatString = "%12." + numberOfSignificantValueDigits + "f %2.12f %10d %14.2f\n";
-                lastLinePercentileFormatString = "%12." + numberOfSignificantValueDigits + "f %2.12f %10d\n";
+                percentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d %14.2f\n";
+                lastLinePercentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d\n";
             }
 
             while (iterator.hasNext())
@@ -1641,11 +1636,11 @@ namespace HdrHistogram
                 double mean = getMean() / outputValueUnitScalingRatio;
                 double std_deviation = getStdDeviation() / outputValueUnitScalingRatio;
                 printStream.Write(string.Format(usCulture,
-                        "#[Mean    = %12." + numberOfSignificantValueDigits + "f, StdDeviation   = %12." +
-                                numberOfSignificantValueDigits + "f]\n",
+                        "#[Mean    = %12." + NumberOfSignificantValueDigits + "f, StdDeviation   = %12." +
+                                NumberOfSignificantValueDigits + "f]\n",
                         mean, std_deviation));
                 printStream.Write(string.Format(usCulture,
-                        "#[Max     = %12." + numberOfSignificantValueDigits + "f, Total count    = %12d]\n",
+                        "#[Max     = %12." + NumberOfSignificantValueDigits + "f, Total count    = %12d]\n",
                         getMaxValue() / outputValueUnitScalingRatio, getTotalCount()));
                 printStream.Write(string.Format(usCulture, "#[Buckets = %12d, SubBuckets     = %12d]\n",
                         bucketCount, subBucketCount));
@@ -1664,7 +1659,7 @@ namespace HdrHistogram
         {
             o.Write(lowestDiscernibleValue);
             o.Write(highestTrackableValue);
-            o.Write(numberOfSignificantValueDigits);
+            o.Write(NumberOfSignificantValueDigits);
             o.Write(getNormalizingIndexOffset());
             o.Write(integerToDoubleValueConversionRatio);
             o.Write(getTotalCount());
@@ -1692,8 +1687,9 @@ namespace HdrHistogram
             long indicatedEndTimeStampMsec = o.ReadInt64();
             bool indicatedAutoResize = o.ReadBoolean();
 
-            init(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits,
-                    integerToDoubleValueConversionRatio, normalizingIndexOffset);
+            // TODO: serialization - numberOfSignificantValueDigits is readonly
+            //init(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits,
+            //        integerToDoubleValueConversionRatio, normalizingIndexOffset);
             // Set internalTrackingValues (can't establish them from array yet, because it's not yet read...)
             setTotalCount(indicatedTotalCount);
             maxValue.SetValue(indicatedMaxValue);
@@ -1788,7 +1784,7 @@ namespace HdrHistogram
             buffer.putInt(getEncodingCookie());
             buffer.putInt(relevantLength * wordSizeInBytes);
             buffer.putInt(getNormalizingIndexOffset());
-            buffer.putInt(numberOfSignificantValueDigits);
+            buffer.putInt(NumberOfSignificantValueDigits);
             buffer.putLong(lowestDiscernibleValue);
             buffer.putLong(highestTrackableValue);
             buffer.putDouble(integerToDoubleValueConversionRatio);

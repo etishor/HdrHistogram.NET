@@ -896,7 +896,7 @@ namespace HdrHistogram
 
         public int getNumberOfSignificantValueDigits()
         {
-            return integerValuesHistogram.numberOfSignificantValueDigits;
+            return integerValuesHistogram.NumberOfSignificantValueDigits;
         }
 
         /**
