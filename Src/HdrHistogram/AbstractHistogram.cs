@@ -12,6 +12,8 @@ using System.Runtime.CompilerServices;
 
 namespace HdrHistogram
 {
+#pragma warning disable 0659 // GetHashCode does not make sense for a histogram, even if Equals is implemented
+
     /// <summary>
     /// <h3>An abstract base class for integer values High Dynamic Range (HDR) Histograms</h3>
     /// 
@@ -30,17 +32,10 @@ namespace HdrHistogram
     /// 
     /// See package description for {@link org.HdrHistogram} for details.
     /// </summary>
-    public abstract class AbstractHistogram : AbstractHistogramBase
+    public abstract class AbstractHistogram : AbstractHistogramBase, IEquatable<AbstractHistogram>
     {
-        public override int GetHashCode()
-        {
-            // compiler warns if equals is implemented without GetHashCode()
-            return base.Identity.GetHashCode();
-        }
-
         private static readonly CultureInfo usCulture = CultureInfo.CreateSpecificCulture("en-US");
-
-
+        
         // "Hot" accessed fields (used in the the value recording code path) are bunched here, such
         // that they will have a good chance of ending up in the same cache line as the totalCounts and
         // counts array reference fields that subclass implementations will typically add.
@@ -847,48 +842,61 @@ namespace HdrHistogram
         //
         //
 
-
-        /**
-         * Determine if this histogram is equivalent to another.
-         *
-         * @param other the other histogram to compare to
-         * @return True if this histogram are equivalent with the other.
-         */
-
-        public override bool Equals(object other)
+        /// <summary>
+        /// Determine if this histogram is equivalent to another.
+        /// </summary>
+        /// <param name="other">the other histogram to compare to</param>
+        /// <returns>True if this histogram are equivalent with the other.</returns>
+        public bool Equals(AbstractHistogram other)
         {
-            if (this == other)
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
-            if (!(other is AbstractHistogram))
+
+            if (other == null)
             {
                 return false;
             }
-            AbstractHistogram that = (AbstractHistogram)other;
-            if ((LowestDiscernibleValue != that.LowestDiscernibleValue) ||
-                (highestTrackableValue != that.highestTrackableValue) ||
-                (NumberOfSignificantValueDigits != that.NumberOfSignificantValueDigits) ||
-                (integerToDoubleValueConversionRatio != that.integerToDoubleValueConversionRatio))
+
+            if ((LowestDiscernibleValue != other.LowestDiscernibleValue) ||
+                (highestTrackableValue != other.highestTrackableValue) ||
+                (NumberOfSignificantValueDigits != other.NumberOfSignificantValueDigits) ||
+                (integerToDoubleValueConversionRatio != other.integerToDoubleValueConversionRatio))
             {
                 return false;
             }
-            if (countsArrayLength != that.countsArrayLength)
+            if (countsArrayLength != other.countsArrayLength)
             {
                 return false;
             }
-            if (getTotalCount() != that.getTotalCount())
+            if (getTotalCount() != other.getTotalCount())
             {
                 return false;
             }
             for (int i = 0; i < countsArrayLength; i++)
             {
-                if (getCountAtIndex(i) != that.getCountAtIndex(i))
+                if (getCountAtIndex(i) != other.getCountAtIndex(i))
                 {
                     return false;
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Determine if this histogram is equivalent to another.
+        /// </summary>
+        /// <param name="other">the other histogram to compare to</param>
+        /// <returns>True if this histogram are equivalent with the other.</returns>
+        public override bool Equals(object other)
+        {
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return this.Equals(other as AbstractHistogram);
         }
 
         //
@@ -1945,7 +1953,11 @@ namespace HdrHistogram
             int subBucketCount = (int)Math.Pow(2, subBucketCountMagnitude);
             return subBucketCount;
         }
+
+
     }
+
+#pragma warning restore 0659
 }
 
 
