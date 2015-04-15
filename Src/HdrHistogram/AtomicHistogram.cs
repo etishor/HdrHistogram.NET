@@ -30,7 +30,7 @@ namespace HdrHistogram
 
     public class AtomicHistogram : Histogram
     {
-        private new AtomicLong totalCount;
+        private new AtomicLong totalCount = new AtomicLong();
         private new AtomicLongArray counts;
 
         internal override long getCountAtIndex(int index)

@@ -176,7 +176,7 @@ namespace HdrHistogram
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        protected internal override void updatedMaxValue(long maxValue)
+        protected override void updatedMaxValue(long maxValue)
         {
             if (maxValue > getMaxValue())
             {
@@ -185,7 +185,7 @@ namespace HdrHistogram
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        protected internal override void updateMinNonZeroValue(long minNonZeroValue)
+        protected override void updateMinNonZeroValue(long minNonZeroValue)
         {
             if (minNonZeroValue < getMinNonZeroValue())
             {

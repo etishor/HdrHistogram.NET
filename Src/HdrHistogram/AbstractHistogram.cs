@@ -44,13 +44,13 @@ namespace HdrHistogram
         // "Hot" accessed fields (used in the the value recording code path) are bunched here, such
         // that they will have a good chance of ending up in the same cache line as the totalCounts and
         // counts array reference fields that subclass implementations will typically add.
-        int leadingZeroCountBase;
+        private int leadingZeroCountBase;
         internal protected int subBucketHalfCountMagnitude;
         internal int unitMagnitude;
         internal protected int subBucketHalfCount;
-        long subBucketMask;
-        AtomicLong maxValue = new AtomicLong(0);
-        AtomicLong minNonZeroValue = new AtomicLong(long.MaxValue);
+        private long subBucketMask;
+        private AtomicLong maxValue = new AtomicLong(0);
+        private AtomicLong minNonZeroValue = new AtomicLong(long.MaxValue);
 
         // Sub-classes will typically add a totalCount field and a counts array field, which will likely be laid out
         // right around here due to the subclass layout rules in most practical JVM implementations.
@@ -105,7 +105,7 @@ namespace HdrHistogram
          * May be overridden by subclasses for synchronization or atomicity purposes.
          * @param value new maxValue to set
          */
-        protected internal virtual void updatedMaxValue(long value)
+        protected virtual void updatedMaxValue(long value)
         {
             long current;
             while (value > (current = maxValue.GetValue()))
@@ -114,7 +114,7 @@ namespace HdrHistogram
             }
         }
 
-        protected void resetMaxValue(long maxValue)
+        private void resetMaxValue(long maxValue)
         {
             this.maxValue.SetValue(maxValue);
         }
@@ -124,7 +124,7 @@ namespace HdrHistogram
          * May be overridden by subclasses for synchronization or atomicity purposes.
          * @param value new minNonZeroValue to set
          */
-        protected internal virtual void updateMinNonZeroValue(long value)
+        protected virtual void updateMinNonZeroValue(long value)
         {
             long current;
             while (value < (current = this.minNonZeroValue.GetValue()))
@@ -133,7 +133,7 @@ namespace HdrHistogram
             }
         }
 
-        void resetMinNonZeroValue(long minNonZeroValue)
+        private void resetMinNonZeroValue(long minNonZeroValue)
         {
             this.minNonZeroValue.SetValue(minNonZeroValue);
         }
@@ -1359,8 +1359,8 @@ namespace HdrHistogram
 
         public class Percentiles : Iterable<HistogramIterationValue>
         {
-            private AbstractHistogram histogram;
-            private int percentileTicksPerHalfDistance;
+            private readonly AbstractHistogram histogram;
+            private readonly int percentileTicksPerHalfDistance;
 
             internal Percentiles(AbstractHistogram histogram, int percentileTicksPerHalfDistance)
             {
@@ -1387,8 +1387,8 @@ namespace HdrHistogram
 
         public class LinearBucketValues : Iterable<HistogramIterationValue>
         {
-            private AbstractHistogram histogram;
-            private long valueUnitsPerBucket;
+            private readonly AbstractHistogram histogram;
+            private readonly long valueUnitsPerBucket;
 
             internal LinearBucketValues(AbstractHistogram histogram, long valueUnitsPerBucket)
             {
@@ -1415,9 +1415,9 @@ namespace HdrHistogram
 
         public class LogarithmicBucketValues : Iterable<HistogramIterationValue>
         {
-            private AbstractHistogram histogram;
-            private long valueUnitsInFirstBucket;
-            private double logBase;
+            private readonly AbstractHistogram histogram;
+            private readonly long valueUnitsInFirstBucket;
+            private readonly double logBase;
 
             internal LogarithmicBucketValues(AbstractHistogram histogram, long valueUnitsInFirstBucket, double logBase)
             {
@@ -1444,7 +1444,7 @@ namespace HdrHistogram
          */
         public class RecordedValues : Iterable<HistogramIterationValue>
         {
-            AbstractHistogram histogram;
+            private readonly AbstractHistogram histogram;
 
             internal RecordedValues(AbstractHistogram histogram)
             {
@@ -1469,7 +1469,7 @@ namespace HdrHistogram
          */
         public class AllValues : Iterable<HistogramIterationValue>
         {
-            AbstractHistogram histogram;
+            private readonly AbstractHistogram histogram;
 
             internal AllValues(AbstractHistogram histogram)
             {

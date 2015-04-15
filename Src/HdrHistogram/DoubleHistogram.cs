@@ -54,13 +54,13 @@ namespace HdrHistogram
 
         private long configuredHighestToLowestValueRatio;
 
-        private VolatileDouble currentLowestValueInAutoRange;
-        private VolatileDouble currentHighestValueLimitInAutoRange;
+        private VolatileDouble currentLowestValueInAutoRange = new VolatileDouble(0.0);
+        private VolatileDouble currentHighestValueLimitInAutoRange = new VolatileDouble(0.0);
 
         internal AbstractHistogram integerValuesHistogram;
 
-        internal VolatileDouble doubleToIntegerValueConversionRatio;
-        private VolatileDouble integerToDoubleValueConversionRatio;
+        internal VolatileDouble doubleToIntegerValueConversionRatio = new VolatileDouble(0.0);
+        private VolatileDouble integerToDoubleValueConversionRatio = new VolatileDouble(0.0);
 
         private bool autoResize = false;
 
