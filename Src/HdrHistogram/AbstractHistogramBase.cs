@@ -20,13 +20,20 @@ namespace HdrHistogram
     {
         private static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
-        protected AbstractHistogramBase(int numberOfSignificantValueDigits, bool autoResize)
+        protected AbstractHistogramBase(long lowestDiscernibleValue, int numberOfSignificantValueDigits, bool autoResize)
         {
+            // Verify argument validity
+            if (lowestDiscernibleValue < 1)
+            {
+                throw new ArgumentException("lowestDiscernibleValue must be >= 1");
+            }
+
             if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5))
             {
                 throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5");
             }
 
+            this.LowestDiscernibleValue = lowestDiscernibleValue;
             this.Identity = constructionIdentityCount.GetAndIncrement();
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
             this.AutoResize = autoResize;
@@ -37,8 +44,10 @@ namespace HdrHistogram
         internal protected readonly int NumberOfSignificantValueDigits;
         protected readonly bool AutoResize;
 
+        protected readonly long LowestDiscernibleValue;
+
         internal protected long highestTrackableValue;
-        protected long lowestDiscernibleValue;
+
 
         protected internal int bucketCount;
         protected int subBucketCount;

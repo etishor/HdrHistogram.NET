@@ -175,19 +175,15 @@ namespace HdrHistogram
          *                                       integer between 0 and 5.
          */
         protected AbstractHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool autoResize)
-            : base(numberOfSignificantValueDigits, autoResize)
+            : base(lowestDiscernibleValue, numberOfSignificantValueDigits, autoResize)
         {
-            // Verify argument validity
-            if (lowestDiscernibleValue < 1)
-            {
-                throw new ArgumentException("lowestDiscernibleValue must be >= 1");
-            }
+
             if (highestTrackableValue < 2L * lowestDiscernibleValue)
             {
                 throw new ArgumentException("highestTrackableValue must be >= 2 * lowestDiscernibleValue");
             }
 
-            init(lowestDiscernibleValue, highestTrackableValue, 1.0, 0);
+            init(highestTrackableValue, 1.0, 0);
         }
 
         /**
@@ -202,12 +198,10 @@ namespace HdrHistogram
             this.setEndTimeStamp(source.getEndTimeStamp());
         }
 
-        private void init(long lowestDiscernibleValue,
-                          long highestTrackableValue,
+        private void init(long highestTrackableValue,
                           double integerToDoubleValueConversionRatio,
                           int normalizingIndexOffset)
         {
-            this.lowestDiscernibleValue = lowestDiscernibleValue;
             this.highestTrackableValue = highestTrackableValue;
             this.integerToDoubleValueConversionRatio = integerToDoubleValueConversionRatio;
             if (normalizingIndexOffset != 0)
@@ -217,7 +211,7 @@ namespace HdrHistogram
 
             long largestValueWithSingleUnitResolution = 2 * (long)Math.Pow(10, NumberOfSignificantValueDigits);
 
-            unitMagnitude = (int)Math.Floor(Math.Log(lowestDiscernibleValue) / Math.Log(2));
+            unitMagnitude = (int)Math.Floor(Math.Log(LowestDiscernibleValue) / Math.Log(2));
 
             // We need to maintain power-of-two subBucketCount (for clean direct indexing) that is large enough to
             // provide unit resolution to at least largestValueWithSingleUnitResolution. So figure out
@@ -251,7 +245,7 @@ namespace HdrHistogram
 
         protected int determineArrayLengthNeeded(long highestTrackableValue)
         {
-            if (highestTrackableValue < 2L * lowestDiscernibleValue)
+            if (highestTrackableValue < 2L * LowestDiscernibleValue)
             {
                 throw new ArgumentException("highestTrackableValue (" + highestTrackableValue + ") cannot be < (2 * lowestDiscernibleValue)");
             }
@@ -875,7 +869,7 @@ namespace HdrHistogram
                 return false;
             }
             AbstractHistogram that = (AbstractHistogram)other;
-            if ((lowestDiscernibleValue != that.lowestDiscernibleValue) ||
+            if ((LowestDiscernibleValue != that.LowestDiscernibleValue) ||
                 (highestTrackableValue != that.highestTrackableValue) ||
                 (NumberOfSignificantValueDigits != that.NumberOfSignificantValueDigits) ||
                 (integerToDoubleValueConversionRatio != that.integerToDoubleValueConversionRatio))
@@ -914,7 +908,7 @@ namespace HdrHistogram
          */
         public long getLowestDiscernibleValue()
         {
-            return lowestDiscernibleValue;
+            return LowestDiscernibleValue;
         }
 
         /**
@@ -1638,7 +1632,7 @@ namespace HdrHistogram
 
         internal protected void writeObject(BinaryWriter o)
         {
-            o.Write(lowestDiscernibleValue);
+            o.Write(LowestDiscernibleValue);
             o.Write(highestTrackableValue);
             o.Write(NumberOfSignificantValueDigits);
             o.Write(getNormalizingIndexOffset());
@@ -1768,7 +1762,7 @@ namespace HdrHistogram
             buffer.putInt(relevantLength * wordSizeInBytes);
             buffer.putInt(getNormalizingIndexOffset());
             buffer.putInt(NumberOfSignificantValueDigits);
-            buffer.putLong(lowestDiscernibleValue);
+            buffer.putLong(LowestDiscernibleValue);
             buffer.putLong(highestTrackableValue);
             buffer.putDouble(integerToDoubleValueConversionRatio);
 
