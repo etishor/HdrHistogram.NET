@@ -55,7 +55,7 @@ namespace HdrHistogram
 
 
         protected internal int bucketCount;
-        protected int subBucketCount;
+        protected internal int subBucketCount;
         internal int countsArrayLength;
 
 

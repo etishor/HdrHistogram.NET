@@ -6,7 +6,6 @@
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -34,8 +33,6 @@ namespace HdrHistogram
     /// </summary>
     public abstract class AbstractHistogram : AbstractHistogramBase, IEquatable<AbstractHistogram>
     {
-        private static readonly CultureInfo usCulture = CultureInfo.CreateSpecificCulture("en-US");
-        
         // "Hot" accessed fields (used in the the value recording code path) are bunched here, such
         // that they will have a good chance of ending up in the same cache line as the totalCounts and
         // counts array reference fields that subclass implementations will typically add.
@@ -1277,137 +1274,6 @@ namespace HdrHistogram
         {
             int index = Math.Min(Math.Max(0, countsArrayIndex(value)), (countsArrayLength - 1));
             return getCountAtIndex(index);
-        }
-
-        /**
-         * Produce textual representation of the value distribution of histogram data by percentile. The distribution is
-         * output with exponentially increasing resolution, with each exponentially decreasing half-distance containing
-         * five (5) percentile reporting tick points.
-         *
-         * @param printStream    Stream into which the distribution will be output
-         * <p>
-         * @param outputValueUnitScalingRatio    The scaling factor by which to divide histogram recorded values units in
-         *                                     output
-         */
-
-        public void outputPercentileDistribution(TextWriter printStream, double outputValueUnitScalingRatio)
-        {
-            outputPercentileDistribution(printStream, 5, outputValueUnitScalingRatio);
-        }
-
-        //
-        //
-        //
-        // Textual percentile output support:
-        //
-        //
-        //
-
-        /**
-         * Produce textual representation of the value distribution of histogram data by percentile. The distribution is
-         * output with exponentially increasing resolution, with each exponentially decreasing half-distance containing
-         * <i>dumpTicksPerHalf</i> percentile reporting tick points.
-         *
-         * @param printStream    Stream into which the distribution will be output
-         * <p>
-         * @param percentileTicksPerHalfDistance  The number of reporting points per exponentially decreasing half-distance
-         * <p>
-         * @param outputValueUnitScalingRatio    The scaling factor by which to divide histogram recorded values units in
-         *                                     output
-         */
-        public void outputPercentileDistribution(TextWriter printStream,
-                                                 int percentileTicksPerHalfDistance,
-                                                 double outputValueUnitScalingRatio)
-        {
-            outputPercentileDistribution(printStream, percentileTicksPerHalfDistance, outputValueUnitScalingRatio, false);
-        }
-
-        /**
-         * Produce textual representation of the value distribution of histogram data by percentile. The distribution is
-         * output with exponentially increasing resolution, with each exponentially decreasing half-distance containing
-         * <i>dumpTicksPerHalf</i> percentile reporting tick points.
-         *
-         * @param printStream    Stream into which the distribution will be output
-         * <p>
-         * @param percentileTicksPerHalfDistance  The number of reporting points per exponentially decreasing half-distance
-         * <p>
-         * @param outputValueUnitScalingRatio    The scaling factor by which to divide histogram recorded values units in
-         *                                     output
-         * @param useCsvFormat  Output in CSV format if true. Otherwise use plain text form.
-         */
-        public void outputPercentileDistribution(TextWriter printStream,
-                                                 int percentileTicksPerHalfDistance,
-                                                 double outputValueUnitScalingRatio,
-                                                 bool useCsvFormat)
-        {
-
-            if (useCsvFormat)
-            {
-                printStream.Write("\"Value\",\"Percentile\",\"TotalCount\",\"1/(1-Percentile)\"\n");
-            }
-            else
-            {
-                printStream.Write("{0,12} {1,14} {2,10} {3,14}\n\n", "Value", "Percentile", "TotalCount", "1/(1-Percentile)");
-            }
-
-            String percentileFormatString;
-            String lastLinePercentileFormatString;
-            if (useCsvFormat)
-            {
-                percentileFormatString = "%." + NumberOfSignificantValueDigits + "f,%.12f,%d,%.2f\n";
-                lastLinePercentileFormatString = "%." + NumberOfSignificantValueDigits + "f,%.12f,%d,Infinity\n";
-            }
-            else
-            {
-                percentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d %14.2f\n";
-                lastLinePercentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d\n";
-            }
-
-            foreach (var iterationValue in this.Percentiles(percentileTicksPerHalfDistance))
-            {
-                if (iterationValue.getPercentileLevelIteratedTo() != 100.0D)
-                {
-                    printStream.Write(string.Format(usCulture, percentileFormatString,
-                        iterationValue.getValueIteratedTo() / outputValueUnitScalingRatio,
-                        iterationValue.getPercentileLevelIteratedTo() / 100.0D,
-                        iterationValue.getTotalCountToThisValue(),
-                        1 / (1.0D - (iterationValue.getPercentileLevelIteratedTo() / 100.0D))));
-                }
-                else
-                {
-                    printStream.Write(string.Format(usCulture, lastLinePercentileFormatString,
-                        iterationValue.getValueIteratedTo() / outputValueUnitScalingRatio,
-                        iterationValue.getPercentileLevelIteratedTo() / 100.0D,
-                        iterationValue.getTotalCountToThisValue()));
-                }
-            }
-
-            if (!useCsvFormat)
-            {
-                // Calculate and output mean and std. deviation.
-                // Note: mean/std. deviation numbers are very often completely irrelevant when
-                // data is extremely non-normal in distribution (e.g. in cases of strong multi-modal
-                // response time distribution associated with GC pauses). However, reporting these numbers
-                // can be very useful for contrasting with the detailed percentile distribution
-                // reported by outputPercentileDistribution(). It is not at all surprising to find
-                // percentile distributions where results fall many tens or even hundreds of standard
-                // deviations away from the mean - such results simply indicate that the data sampled
-                // exhibits a very non-normal distribution, highlighting situations for which the std.
-                // deviation metric is a useless indicator.
-                //
-
-                double mean = getMean() / outputValueUnitScalingRatio;
-                double std_deviation = getStdDeviation() / outputValueUnitScalingRatio;
-                printStream.Write(string.Format(usCulture,
-                        "#[Mean    = %12." + NumberOfSignificantValueDigits + "f, StdDeviation   = %12." +
-                                NumberOfSignificantValueDigits + "f]\n",
-                        mean, std_deviation));
-                printStream.Write(string.Format(usCulture,
-                        "#[Max     = %12." + NumberOfSignificantValueDigits + "f, Total count    = %12d]\n",
-                        getMaxValue() / outputValueUnitScalingRatio, getTotalCount()));
-                printStream.Write(string.Format(usCulture, "#[Buckets = %12d, SubBuckets     = %12d]\n",
-                        bucketCount, subBucketCount));
-            }
         }
 
         //
