@@ -57,10 +57,5 @@ namespace HdrHistogram
             integerLinearIterator.next();
             return iterationValue;
         }
-
-        protected internal override void remove()
-        {
-            integerLinearIterator.remove();
-        }
     }
 }

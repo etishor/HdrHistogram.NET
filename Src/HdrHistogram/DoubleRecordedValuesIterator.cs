@@ -48,10 +48,5 @@ namespace HdrHistogram
             integerRecordedValuesIterator.next();
             return iterationValue;
         }
-
-        protected internal override void remove()
-        {
-            integerRecordedValuesIterator.remove();
-        }
     }
 }

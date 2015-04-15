@@ -8,10 +8,9 @@ using System;
 
 namespace HdrHistogram
 {
-
-    /**
-     * Used for iterating through histogram values.
-     */
+    /// <summary>
+    /// Used for iterating through histogram values.
+    /// </summary>
     public abstract class AbstractHistogramIterator : Iterator<HistogramIterationValue>
     {
         protected AbstractHistogram histogram;
@@ -109,15 +108,6 @@ namespace HdrHistogram
             }
             // Should not reach here. But possible for overflowed histograms under certain conditions
             throw new IndexOutOfRangeException();
-        }
-
-        /**
-         * Not supported. Will throw an {@link UnsupportedOperationException}.
-         */
-
-        internal protected override void remove()
-        {
-            throw new NotSupportedException();
         }
 
         protected abstract void incrementIterationLevel();
