@@ -738,7 +738,7 @@ namespace HdrHistogram
         {
             DoubleHistogram toHistogram = this;
 
-            foreach (HistogramIterationValue v in fromHistogram.integerValuesHistogram.recordedValues())
+            foreach (HistogramIterationValue v in fromHistogram.integerValuesHistogram.RecordedValues())
             {
                 toHistogram.recordValueWithCountAndExpectedInterval(
                     v.getValueIteratedTo() * integerToDoubleValueConversionRatio.GetValue(),

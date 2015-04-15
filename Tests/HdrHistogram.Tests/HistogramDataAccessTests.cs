@@ -276,7 +276,7 @@ namespace HdrHistogram.Tests
         [Fact]
         public void testPercentiles()
         {
-            foreach (HistogramIterationValue v in histogram.percentiles(5 /* ticks per half */))
+            foreach (HistogramIterationValue v in histogram.Percentiles(5 /* ticks per half */))
             {
                 AssertEqual("Value at Iterated-to Percentile is the same as the matching getValueAtPercentile():\n" +
                         "getPercentileLevelIteratedTo = " + v.getPercentileLevelIteratedTo() +
@@ -309,7 +309,7 @@ namespace HdrHistogram.Tests
             // expected covering the range.
 
             // Iterate raw data using linear buckets of 100 msec each.
-            foreach (HistogramIterationValue v in rawHistogram.linearBucketValues(100000))
+            foreach (HistogramIterationValue v in rawHistogram.LinearBucketValues(100000))
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -334,7 +334,7 @@ namespace HdrHistogram.Tests
             index = 0;
             long totalAddedCounts = 0;
             // Iterate data using linear buckets of 10 msec each.
-            foreach (HistogramIterationValue v in histogram.linearBucketValues(10000))
+            foreach (HistogramIterationValue v in histogram.LinearBucketValues(10000))
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -359,7 +359,7 @@ namespace HdrHistogram.Tests
             index = 0;
             totalAddedCounts = 0;
             // Iterate data using linear buckets of 1 msec each.
-            foreach (HistogramIterationValue v in histogram.linearBucketValues(1000))
+            foreach (HistogramIterationValue v in histogram.LinearBucketValues(1000))
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -396,7 +396,7 @@ namespace HdrHistogram.Tests
         {
             int index = 0;
             // Iterate raw data using logarithmic buckets starting at 10 msec.
-            foreach (HistogramIterationValue v in rawHistogram.logarithmicBucketValues(10000, 2))
+            foreach (HistogramIterationValue v in rawHistogram.LogarithmicBucketValues(10000, 2))
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -420,7 +420,7 @@ namespace HdrHistogram.Tests
 
             index = 0;
             long totalAddedCounts = 0;
-            foreach (HistogramIterationValue v in histogram.logarithmicBucketValues(10000, 2))
+            foreach (HistogramIterationValue v in histogram.LogarithmicBucketValues(10000, 2))
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -443,7 +443,7 @@ namespace HdrHistogram.Tests
         {
             int index = 0;
             // Iterate raw data by stepping through every value that has a count recorded:
-            foreach (HistogramIterationValue v in rawHistogram.recordedValues())
+            foreach (HistogramIterationValue v in rawHistogram.RecordedValues())
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -462,7 +462,7 @@ namespace HdrHistogram.Tests
 
             index = 0;
             long totalAddedCounts = 0;
-            foreach (HistogramIterationValue v in histogram.recordedValues())
+            foreach (HistogramIterationValue v in histogram.RecordedValues())
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 0)
@@ -490,7 +490,7 @@ namespace HdrHistogram.Tests
             long totalCountToThisPoint = 0;
             long totalValueToThisPoint = 0;
             // Iterate raw data by stepping through every value that has a count recorded:
-            foreach (HistogramIterationValue v in rawHistogram.allValues())
+            foreach (HistogramIterationValue v in rawHistogram.AllValues())
             {
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
                 if (index == 1000)
@@ -520,7 +520,7 @@ namespace HdrHistogram.Tests
             index = 0;
             long totalAddedCounts = 0;
             HistogramIterationValue v1 = null;
-            foreach (HistogramIterationValue v in histogram.allValues())
+            foreach (HistogramIterationValue v in histogram.AllValues())
             {
                 v1 = v;
                 long countAddedInThisBucket = v.getCountAddedInThisIterationStep();
@@ -548,7 +548,7 @@ namespace HdrHistogram.Tests
         {
             var histogram1 = histogram.copy();
 
-            AbstractHistogram.AllValues values = histogram1.allValues();
+            var values = histogram1.AllValues();
             List<long> ranges = new List<long>();
             List<long> counts = new List<long>();
             int index = 0;

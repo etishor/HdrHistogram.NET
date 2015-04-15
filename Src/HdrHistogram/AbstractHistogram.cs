@@ -5,6 +5,7 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -229,7 +230,6 @@ namespace HdrHistogram
             // Establish leadingZeroCountBase, used in getBucketIndex() fast path:
             leadingZeroCountBase = 64 - unitMagnitude - subBucketHalfCountMagnitude - 1;
 
-            percentileIterator = new PercentileIterator(this, 1);
             recordedValuesIterator = new RecordedValuesIterator(this);
         }
 
@@ -663,7 +663,7 @@ namespace HdrHistogram
         {
             AbstractHistogram toHistogram = this;
 
-            foreach (HistogramIterationValue v in otherHistogram.recordedValues())
+            foreach (HistogramIterationValue v in otherHistogram.RecordedValues())
             {
                 toHistogram.recordValueWithCountAndExpectedInterval(v.getValueIteratedTo(),
                         v.getCountAtValueIteratedTo(), expectedIntervalBetweenValueSamples);
@@ -1285,9 +1285,9 @@ namespace HdrHistogram
          * through the histogram using a
          * {@link PercentileIterator}
          */
-        public Percentiles percentiles(int percentileTicksPerHalfDistance)
+        public IEnumerable<HistogramIterationValue> Percentiles(int percentileTicksPerHalfDistance)
         {
-            return new Percentiles(this, percentileTicksPerHalfDistance);
+            return IterateOver(new PercentileIterator(this, percentileTicksPerHalfDistance));
         }
 
         /**
@@ -1300,9 +1300,9 @@ namespace HdrHistogram
          * through the histogram using a
          * {@link LinearIterator}
          */
-        public LinearBucketValues linearBucketValues(long valueUnitsPerBucket)
+        public IEnumerable<HistogramIterationValue> LinearBucketValues(long valueUnitsPerBucket)
         {
-            return new LinearBucketValues(this, valueUnitsPerBucket);
+            return IterateOver(new LinearIterator(this, valueUnitsPerBucket));
         }
 
         /**
@@ -1316,9 +1316,9 @@ namespace HdrHistogram
          * through the histogram using
          * a {@link LogarithmicIterator}
          */
-        public LogarithmicBucketValues logarithmicBucketValues(long valueUnitsInFirstBucket, double logBase)
+        public IEnumerable<HistogramIterationValue> LogarithmicBucketValues(long valueUnitsInFirstBucket, double logBase)
         {
-            return new LogarithmicBucketValues(this, valueUnitsInFirstBucket, logBase);
+            return IterateOver(new LogarithmicIterator(this, valueUnitsInFirstBucket, logBase));
         }
 
         /**
@@ -1330,9 +1330,9 @@ namespace HdrHistogram
          * through the histogram using
          * a {@link RecordedValuesIterator}
          */
-        public RecordedValues recordedValues()
+        public IEnumerable<HistogramIterationValue> RecordedValues()
         {
-            return new RecordedValues(this);
+            return IterateOver(new RecordedValuesIterator(this));
         }
 
         /**
@@ -1345,147 +1345,10 @@ namespace HdrHistogram
          * through the histogram using
          * a {@link AllValuesIterator}
          */
-        public AllValues allValues()
+        public IEnumerable<HistogramIterationValue> AllValues()
         {
-            return new AllValues(this);
+            return IterateOver(new AllValuesIterator(this));
         }
-
-        // Percentile iterator support:
-
-        /**
-         * An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
-         * the histogram using a {@link PercentileIterator}
-         */
-
-        public class Percentiles : Iterable<HistogramIterationValue>
-        {
-            private readonly AbstractHistogram histogram;
-            private readonly int percentileTicksPerHalfDistance;
-
-            internal Percentiles(AbstractHistogram histogram, int percentileTicksPerHalfDistance)
-            {
-                this.histogram = histogram;
-                this.percentileTicksPerHalfDistance = percentileTicksPerHalfDistance;
-            }
-
-            /**
-             * @return A {@link PercentileIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
-             */
-
-            protected override Iterator<HistogramIterationValue> iterator()
-            {
-                return new PercentileIterator(histogram, percentileTicksPerHalfDistance);
-            }
-        }
-
-        // Linear iterator support:
-
-        /**
-         * An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
-         * the histogram using a {@link LinearIterator}
-         */
-
-        public class LinearBucketValues : Iterable<HistogramIterationValue>
-        {
-            private readonly AbstractHistogram histogram;
-            private readonly long valueUnitsPerBucket;
-
-            internal LinearBucketValues(AbstractHistogram histogram, long valueUnitsPerBucket)
-            {
-                this.histogram = histogram;
-                this.valueUnitsPerBucket = valueUnitsPerBucket;
-            }
-
-            /**
-             * @return A {@link LinearIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
-             */
-
-            protected override Iterator<HistogramIterationValue> iterator()
-            {
-                return new LinearIterator(histogram, valueUnitsPerBucket);
-            }
-        }
-
-        // Logarithmic iterator support:
-
-        /**
-         * An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
-         * the histogram using a {@link LogarithmicIterator}
-         */
-
-        public class LogarithmicBucketValues : Iterable<HistogramIterationValue>
-        {
-            private readonly AbstractHistogram histogram;
-            private readonly long valueUnitsInFirstBucket;
-            private readonly double logBase;
-
-            internal LogarithmicBucketValues(AbstractHistogram histogram, long valueUnitsInFirstBucket, double logBase)
-            {
-                this.histogram = histogram;
-                this.valueUnitsInFirstBucket = valueUnitsInFirstBucket;
-                this.logBase = logBase;
-            }
-
-            /**
-             * @return A {@link LogarithmicIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
-             */
-
-            protected override Iterator<HistogramIterationValue> iterator()
-            {
-                return new LogarithmicIterator(histogram, valueUnitsInFirstBucket, logBase);
-            }
-        }
-
-        // Recorded value iterator support:
-
-        /**
-         * An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
-         * the histogram using a {@link RecordedValuesIterator}
-         */
-        public class RecordedValues : Iterable<HistogramIterationValue>
-        {
-            private readonly AbstractHistogram histogram;
-
-            internal RecordedValues(AbstractHistogram histogram)
-            {
-                this.histogram = histogram;
-            }
-
-            /**
-             * @return A {@link RecordedValuesIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
-             */
-
-            protected override Iterator<HistogramIterationValue> iterator()
-            {
-                return new RecordedValuesIterator(histogram);
-            }
-        }
-
-        // AllValues iterator support:
-
-        /**
-         * An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
-         * the histogram using a {@link AllValuesIterator}
-         */
-        public class AllValues : Iterable<HistogramIterationValue>
-        {
-            private readonly AbstractHistogram histogram;
-
-            internal AllValues(AbstractHistogram histogram)
-            {
-                this.histogram = histogram;
-            }
-
-            /**
-             * @return A {@link AllValuesIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
-             */
-
-            protected override Iterator<HistogramIterationValue> iterator()
-            {
-                return new AllValuesIterator(histogram);
-            }
-        }
-
 
         /**
          * Produce textual representation of the value distribution of histogram data by percentile. The distribution is

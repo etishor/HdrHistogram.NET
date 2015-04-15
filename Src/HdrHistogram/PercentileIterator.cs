@@ -5,17 +5,10 @@
 // Java Version repo: https://github.com/HdrHistogram/HdrHistogram
 // Latest ported version is available in the Java submodule in the root of the repo
 using System;
+using System.Diagnostics;
 
 namespace HdrHistogram
 {
-    /**
- * Written by Gil Tene of Azul Systems, and released to the public domain,
- * as explained at http://creativecommons.org/publicdomain/zero/1.0/
- *
- * @author Gil Tene
- */
-
-
     /**
      * Used for iterating through histogram values according to percentile levels. The iteration is
      * performed in steps that start at 0% and reduce their distance to 100% according to the
@@ -54,6 +47,7 @@ namespace HdrHistogram
          */
         public PercentileIterator(AbstractHistogram histogram, int percentileTicksPerHalfDistance)
         {
+            Debug.Assert(histogram != null);
             reset(histogram, percentileTicksPerHalfDistance);
         }
 

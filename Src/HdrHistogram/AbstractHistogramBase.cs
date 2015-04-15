@@ -6,6 +6,7 @@
 // Latest ported version is available in the Java submodule in the root of the repo
 
 using System;
+using System.Collections.Generic;
 
 namespace HdrHistogram
 {
@@ -20,7 +21,7 @@ namespace HdrHistogram
     {
         private static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
-        protected AbstractHistogramBase(long lowestDiscernibleValue, int numberOfSignificantValueDigits, 
+        protected AbstractHistogramBase(long lowestDiscernibleValue, int numberOfSignificantValueDigits,
             int wordSizeInBytes, bool autoResize)
         {
             // Verify argument validity
@@ -39,12 +40,14 @@ namespace HdrHistogram
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
             this.WordSizeInBytes = wordSizeInBytes;
             this.AutoResize = autoResize;
+
+            this.percentileIterator = new PercentileIterator(this as AbstractHistogram, 1);
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
         internal protected readonly long Identity;
         internal protected readonly int NumberOfSignificantValueDigits;
-        
+
         protected readonly bool AutoResize;
         protected readonly int WordSizeInBytes;
         protected readonly long LowestDiscernibleValue;
@@ -55,15 +58,26 @@ namespace HdrHistogram
         protected internal int bucketCount;
         protected int subBucketCount;
         internal int countsArrayLength;
-        
+
 
         internal protected long startTimeStampMsec = long.MaxValue;
         internal protected long endTimeStampMsec = 0;
 
         internal protected double integerToDoubleValueConversionRatio = 1.0;
 
-        protected PercentileIterator percentileIterator;
+        protected readonly PercentileIterator percentileIterator;
         protected RecordedValuesIterator recordedValuesIterator;
         protected ByteBuffer intermediateUncompressedByteBuffer = null;
+
+        protected static IEnumerable<HistogramIterationValue> IterateOver(AbstractHistogramIterator iterator)
+        {
+            using (iterator)
+            {
+                while (iterator.MoveNext())
+                {
+                    yield return iterator.Current;
+                }
+            }
+        }
     }
 }
