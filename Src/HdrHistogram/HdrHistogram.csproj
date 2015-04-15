@@ -48,6 +48,7 @@
     </Compile>
     <Compile Include="AbstractHistogram.cs" />
     <Compile Include="AbstractHistogramBase.cs" />
+    <Compile Include="AbstractHistogramEnumerableExtensions.cs" />
     <Compile Include="AbstractHistogramIterator.cs" />
     <Compile Include="AllValuesIterator.cs" />
     <Compile Include="App_Packages\ConcurrencyUtils.0.1.2\AtomicIntArray.cs" />

@@ -1275,82 +1275,6 @@ namespace HdrHistogram
         }
 
         /**
-         * Provide a means of iterating through histogram values according to percentile levels. The iteration is
-         * performed in steps that start at 0% and reduce their distance to 100% according to the
-         * <i>percentileTicksPerHalfDistance</i> parameter, ultimately reaching 100% when all recorded histogram
-         * values are exhausted.
-         * <p>
-         * @param percentileTicksPerHalfDistance The number of iteration steps per half-distance to 100%.
-         * @return An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >}
-         * through the histogram using a
-         * {@link PercentileIterator}
-         */
-        public IEnumerable<HistogramIterationValue> Percentiles(int percentileTicksPerHalfDistance)
-        {
-            return IterateOver(new PercentileIterator(this, percentileTicksPerHalfDistance));
-        }
-
-        /**
-         * Provide a means of iterating through histogram values using linear steps. The iteration is
-         * performed in steps of <i>valueUnitsPerBucket</i> in size, terminating when all recorded histogram
-         * values are exhausted.
-         *
-         * @param valueUnitsPerBucket  The size (in value units) of the linear buckets to use
-         * @return An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >}
-         * through the histogram using a
-         * {@link LinearIterator}
-         */
-        public IEnumerable<HistogramIterationValue> LinearBucketValues(long valueUnitsPerBucket)
-        {
-            return IterateOver(new LinearIterator(this, valueUnitsPerBucket));
-        }
-
-        /**
-         * Provide a means of iterating through histogram values at logarithmically increasing levels. The iteration is
-         * performed in steps that start at <i>valueUnitsInFirstBucket</i> and increase exponentially according to
-         * <i>logBase</i>, terminating when all recorded histogram values are exhausted.
-         *
-         * @param valueUnitsInFirstBucket The size (in value units) of the first bucket in the iteration
-         * @param logBase The multiplier by which bucket sizes will grow in each iteration step
-         * @return An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >}
-         * through the histogram using
-         * a {@link LogarithmicIterator}
-         */
-        public IEnumerable<HistogramIterationValue> LogarithmicBucketValues(long valueUnitsInFirstBucket, double logBase)
-        {
-            return IterateOver(new LogarithmicIterator(this, valueUnitsInFirstBucket, logBase));
-        }
-
-        /**
-         * Provide a means of iterating through all recorded histogram values using the finest granularity steps
-         * supported by the underlying representation. The iteration steps through all non-zero recorded value counts,
-         * and terminates when all recorded histogram values are exhausted.
-         *
-         * @return An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >}
-         * through the histogram using
-         * a {@link RecordedValuesIterator}
-         */
-        public IEnumerable<HistogramIterationValue> RecordedValues()
-        {
-            return IterateOver(new RecordedValuesIterator(this));
-        }
-
-        /**
-         * Provide a means of iterating through all histogram values using the finest granularity steps supported by
-         * the underlying representation. The iteration steps through all possible unit value levels, regardless of
-         * whether or not there were recorded values for that value level, and terminates when all recorded histogram
-         * values are exhausted.
-         *
-         * @return An {@link java.lang.Iterable}{@literal <}{@link HistogramIterationValue}{@literal >}
-         * through the histogram using
-         * a {@link AllValuesIterator}
-         */
-        public IEnumerable<HistogramIterationValue> AllValues()
-        {
-            return IterateOver(new AllValuesIterator(this));
-        }
-
-        /**
          * Produce textual representation of the value distribution of histogram data by percentile. The distribution is
          * output with exponentially increasing resolution, with each exponentially decreasing half-distance containing
          * five (5) percentile reporting tick points.
@@ -1421,9 +1345,6 @@ namespace HdrHistogram
                 printStream.Write("{0,12} {1,14} {2,10} {3,14}\n\n", "Value", "Percentile", "TotalCount", "1/(1-Percentile)");
             }
 
-            PercentileIterator iterator = percentileIterator;
-            iterator.reset(percentileTicksPerHalfDistance);
-
             String percentileFormatString;
             String lastLinePercentileFormatString;
             if (useCsvFormat)
@@ -1436,7 +1357,6 @@ namespace HdrHistogram
                 percentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d %14.2f\n";
                 lastLinePercentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d\n";
             }
-
             
             foreach (var iterationValue in this.Percentiles(percentileTicksPerHalfDistance))
             {
