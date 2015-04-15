@@ -20,7 +20,8 @@ namespace HdrHistogram
     {
         private static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
-        protected AbstractHistogramBase(long lowestDiscernibleValue, int numberOfSignificantValueDigits, bool autoResize)
+        protected AbstractHistogramBase(long lowestDiscernibleValue, int numberOfSignificantValueDigits, 
+            int wordSizeInBytes, bool autoResize)
         {
             // Verify argument validity
             if (lowestDiscernibleValue < 1)
@@ -36,14 +37,16 @@ namespace HdrHistogram
             this.LowestDiscernibleValue = lowestDiscernibleValue;
             this.Identity = constructionIdentityCount.GetAndIncrement();
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
+            this.WordSizeInBytes = wordSizeInBytes;
             this.AutoResize = autoResize;
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
         internal protected readonly long Identity;
         internal protected readonly int NumberOfSignificantValueDigits;
+        
         protected readonly bool AutoResize;
-
+        protected readonly int WordSizeInBytes;
         protected readonly long LowestDiscernibleValue;
 
         internal protected long highestTrackableValue;
@@ -52,7 +55,7 @@ namespace HdrHistogram
         protected internal int bucketCount;
         protected int subBucketCount;
         internal int countsArrayLength;
-        protected int wordSizeInBytes;
+        
 
         internal protected long startTimeStampMsec = long.MaxValue;
         internal protected long endTimeStampMsec = 0;

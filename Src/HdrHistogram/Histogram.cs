@@ -166,7 +166,7 @@ namespace HdrHistogram
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
         public Histogram(int numberOfSignificantValueDigits)
-            : this(1, 2, numberOfSignificantValueDigits, allocateCountsArray: true, autoResize: true)
+            : this(1, 2, numberOfSignificantValueDigits, sizeof(long), allocateCountsArray: true, autoResize: true)
         { }
 
         /**
@@ -201,9 +201,8 @@ namespace HdrHistogram
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
         public Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : this(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: true, autoResize: false)
-        {
-        }
+            : this(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, sizeof(long), allocateCountsArray: true, autoResize: false)
+        { }
 
         /**
          * Construct a histogram with the same range settings as a given source histogram,
@@ -222,17 +221,15 @@ namespace HdrHistogram
             {
                 counts = new long[countsArrayLength];
             }
-            wordSizeInBytes = 8;
         }
 
-        protected Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool allocateCountsArray, bool autoResize)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, autoResize)
+        protected Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, int wordSizeInBytes, bool allocateCountsArray, bool autoResize)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, wordSizeInBytes, autoResize)
         {
             if (allocateCountsArray)
             {
                 counts = new long[countsArrayLength];
             }
-            wordSizeInBytes = 8;
         }
 
         /**

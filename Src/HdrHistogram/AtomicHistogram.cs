@@ -174,10 +174,9 @@ namespace HdrHistogram
      */
 
         public AtomicHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: false, autoResize: false)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, wordSizeInBytes: sizeof(long), allocateCountsArray: false, autoResize: false)
         {
             counts = new AtomicLongArray(countsArrayLength);
-            wordSizeInBytes = 8;
         }
 
         /**
@@ -190,7 +189,6 @@ namespace HdrHistogram
             : base(source, false)
         {
             counts = new AtomicLongArray(countsArrayLength);
-            wordSizeInBytes = 8;
         }
 
         /**

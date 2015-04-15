@@ -154,8 +154,8 @@ namespace HdrHistogram
          *                                       maintain value resolution and separation. Must be a non-negative
          *                                       integer between 0 and 5.
          */
-        protected AbstractHistogram(int numberOfSignificantValueDigits)
-            : this(1, 2, numberOfSignificantValueDigits, true)
+        protected AbstractHistogram(int numberOfSignificantValueDigits, int wordSizeInBytes, bool autoResize)
+            : this(1, 2, numberOfSignificantValueDigits, wordSizeInBytes, autoResize)
         { }
 
         /**
@@ -174,8 +174,8 @@ namespace HdrHistogram
          *                                       maintain value resolution and separation. Must be a non-negative
          *                                       integer between 0 and 5.
          */
-        protected AbstractHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool autoResize)
-            : base(lowestDiscernibleValue, numberOfSignificantValueDigits, autoResize)
+        protected AbstractHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, int wordSizeInBytes, bool autoResize)
+            : base(lowestDiscernibleValue, numberOfSignificantValueDigits, wordSizeInBytes, autoResize)
         {
 
             if (highestTrackableValue < 2L * lowestDiscernibleValue)
@@ -192,7 +192,7 @@ namespace HdrHistogram
          * @param source The source histogram to duplicate
          */
         protected AbstractHistogram(AbstractHistogram source)
-            : this(source.getLowestDiscernibleValue(), source.getHighestTrackableValue(), source.getNumberOfSignificantValueDigits(), source.AutoResize)
+            : this(source.getLowestDiscernibleValue(), source.getHighestTrackableValue(), source.getNumberOfSignificantValueDigits(), source.WordSizeInBytes, source.AutoResize)
         {
             this.setStartTimeStamp(source.getStartTimeStamp());
             this.setEndTimeStamp(source.getEndTimeStamp());
@@ -1704,7 +1704,7 @@ namespace HdrHistogram
 
         int getNeededPayloadByteBufferCapacity(int relevantLength)
         {
-            return (relevantLength * wordSizeInBytes);
+            return (relevantLength * WordSizeInBytes);
         }
 
         internal protected abstract void fillCountsArrayFromBuffer(ByteBuffer buffer, int length);
@@ -1719,17 +1719,17 @@ namespace HdrHistogram
 
         private int getV0EncodingCookie()
         {
-            return V0EncodingCookieBase + (wordSizeInBytes << 4);
+            return V0EncodingCookieBase + (WordSizeInBytes << 4);
         }
 
         private int getEncodingCookie()
         {
-            return encodingCookieBase + (wordSizeInBytes << 4);
+            return encodingCookieBase + (WordSizeInBytes << 4);
         }
 
         private int getCompressedEncodingCookie()
         {
-            return compressedEncodingCookieBase + (wordSizeInBytes << 4);
+            return compressedEncodingCookieBase + (WordSizeInBytes << 4);
         }
 
         private static int getCookieBase(int cookie)
@@ -1759,7 +1759,7 @@ namespace HdrHistogram
             }
             int initialPosition = buffer.position();
             buffer.putInt(getEncodingCookie());
-            buffer.putInt(relevantLength * wordSizeInBytes);
+            buffer.putInt(relevantLength * WordSizeInBytes);
             buffer.putInt(getNormalizingIndexOffset());
             buffer.putInt(NumberOfSignificantValueDigits);
             buffer.putLong(LowestDiscernibleValue);
@@ -1893,7 +1893,7 @@ namespace HdrHistogram
                         "The buffer's encoded value byte size (" +
                                 getWordSizeInBytesFromCookie(cookie) +
                                 ") does not match the Histogram's (" +
-                                histogram.wordSizeInBytes + ")");
+                                histogram.WordSizeInBytes + ")");
             }
 
 

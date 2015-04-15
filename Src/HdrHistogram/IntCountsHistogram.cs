@@ -197,10 +197,9 @@ namespace HdrHistogram
      */
 
         public IntCountsHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, autoResize: true)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, sizeof(int), autoResize: true)
         {
             counts = new int[countsArrayLength];
-            wordSizeInBytes = 4;
         }
 
         /**
@@ -213,7 +212,6 @@ namespace HdrHistogram
             : base(source)
         {
             counts = new int[countsArrayLength];
-            wordSizeInBytes = 4;
         }
 
         /**

@@ -499,17 +499,14 @@ namespace HdrHistogram
          *                                       decimal digits to which the histogram will maintain value resolution
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
-        public ConcurrentHistogram(long lowestDiscernibleValue, long highestTrackableValue,
-                                   int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: false, autoResize: true)
+        public ConcurrentHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, wordSizeInBytes: sizeof(long), allocateCountsArray: false, autoResize: true)
         {
             activeCounts = new AtomicLongArray(countsArrayLength);
             activeCountsNormalizingIndexOffset = 0;
 
             inactiveCounts = new AtomicLongArray(countsArrayLength); ;
             inactiveCountsNormalizingIndexOffset = 0;
-
-            wordSizeInBytes = 8;
         }
 
         /**
@@ -525,8 +522,6 @@ namespace HdrHistogram
 
             inactiveCounts = new AtomicLongArray(countsArrayLength); ;
             inactiveCountsNormalizingIndexOffset = 0;
-
-            wordSizeInBytes = 8;
         }
 
         /**

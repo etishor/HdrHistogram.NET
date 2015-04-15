@@ -228,7 +228,7 @@ namespace HdrHistogram
      */
 
         public SynchronizedHistogram(int numberOfSignificantValueDigits)
-            : this(1, 2, numberOfSignificantValueDigits)
+            : base(numberOfSignificantValueDigits)
         { }
 
         /**
@@ -243,9 +243,8 @@ namespace HdrHistogram
      */
 
         public SynchronizedHistogram(long highestTrackableValue, int numberOfSignificantValueDigits)
-            : this(1, highestTrackableValue, numberOfSignificantValueDigits)
-        {
-        }
+            : base(highestTrackableValue, numberOfSignificantValueDigits)
+        { }
 
         /**
      * Construct a SynchronizedHistogram given the Lowest and Highest values to be tracked and a number of significant
@@ -265,7 +264,7 @@ namespace HdrHistogram
      */
 
         public SynchronizedHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: true, autoResize: true)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
         {
         }
 

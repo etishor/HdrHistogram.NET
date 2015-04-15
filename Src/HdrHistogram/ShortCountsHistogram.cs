@@ -197,10 +197,9 @@ namespace HdrHistogram
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
         public ShortCountsHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, autoResize: true)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, sizeof(short), autoResize: true)
         {
             counts = new short[countsArrayLength];
-            wordSizeInBytes = 2;
         }
 
         /**
@@ -212,7 +211,6 @@ namespace HdrHistogram
             : base(source)
         {
             counts = new short[countsArrayLength];
-            wordSizeInBytes = 2;
         }
 
         /**
