@@ -1437,23 +1437,23 @@ namespace HdrHistogram
                 lastLinePercentileFormatString = "%12." + NumberOfSignificantValueDigits + "f %2.12f %10d\n";
             }
 
-            while (iterator.hasNext())
+            
+            foreach (var iterationValue in this.Percentiles(percentileTicksPerHalfDistance))
             {
-                HistogramIterationValue iterationValue = iterator.next();
                 if (iterationValue.getPercentileLevelIteratedTo() != 100.0D)
                 {
                     printStream.Write(string.Format(usCulture, percentileFormatString,
-                            iterationValue.getValueIteratedTo() / outputValueUnitScalingRatio,
-                            iterationValue.getPercentileLevelIteratedTo() / 100.0D,
-                            iterationValue.getTotalCountToThisValue(),
-                            1 / (1.0D - (iterationValue.getPercentileLevelIteratedTo() / 100.0D))));
+                        iterationValue.getValueIteratedTo() / outputValueUnitScalingRatio,
+                        iterationValue.getPercentileLevelIteratedTo() / 100.0D,
+                        iterationValue.getTotalCountToThisValue(),
+                        1 / (1.0D - (iterationValue.getPercentileLevelIteratedTo() / 100.0D))));
                 }
                 else
                 {
                     printStream.Write(string.Format(usCulture, lastLinePercentileFormatString,
-                            iterationValue.getValueIteratedTo() / outputValueUnitScalingRatio,
-                            iterationValue.getPercentileLevelIteratedTo() / 100.0D,
-                            iterationValue.getTotalCountToThisValue()));
+                        iterationValue.getValueIteratedTo() / outputValueUnitScalingRatio,
+                        iterationValue.getPercentileLevelIteratedTo() / 100.0D,
+                        iterationValue.getTotalCountToThisValue()));
                 }
             }
 

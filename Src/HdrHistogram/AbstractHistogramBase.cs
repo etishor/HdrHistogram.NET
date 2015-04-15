@@ -6,7 +6,6 @@
 // Latest ported version is available in the Java submodule in the root of the repo
 
 using System;
-using System.Collections.Generic;
 
 namespace HdrHistogram
 {
@@ -40,8 +39,6 @@ namespace HdrHistogram
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
             this.WordSizeInBytes = wordSizeInBytes;
             this.AutoResize = autoResize;
-
-            this.percentileIterator = new PercentileIterator(this as AbstractHistogram, 1);
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
@@ -65,19 +62,7 @@ namespace HdrHistogram
 
         internal protected double integerToDoubleValueConversionRatio = 1.0;
 
-        protected readonly PercentileIterator percentileIterator;
         protected RecordedValuesIterator recordedValuesIterator;
         protected ByteBuffer intermediateUncompressedByteBuffer = null;
-
-        protected static IEnumerable<HistogramIterationValue> IterateOver(AbstractHistogramIterator iterator)
-        {
-            using (iterator)
-            {
-                while (iterator.MoveNext())
-                {
-                    yield return iterator.Current;
-                }
-            }
-        }
     }
 }
