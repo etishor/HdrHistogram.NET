@@ -161,9 +161,7 @@ namespace HdrHistogram
 
         public IntCountsHistogram(int numberOfSignificantValueDigits)
             : this(1, 2, numberOfSignificantValueDigits)
-        {
-            setAutoResize(true);
-        }
+        { }
 
         /**
      * Construct a IntCountsHistogram given the Highest value to be tracked and a number of significant decimal digits. The
@@ -199,7 +197,7 @@ namespace HdrHistogram
      */
 
         public IntCountsHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, autoResize: true)
         {
             counts = new int[countsArrayLength];
             wordSizeInBytes = 4;

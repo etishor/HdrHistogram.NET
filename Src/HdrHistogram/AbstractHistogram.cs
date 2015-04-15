@@ -155,10 +155,8 @@ namespace HdrHistogram
          *                                       integer between 0 and 5.
          */
         protected AbstractHistogram(int numberOfSignificantValueDigits)
-            : this(1, 2, numberOfSignificantValueDigits)
-        {
-            autoResize = true;
-        }
+            : this(1, 2, numberOfSignificantValueDigits, true)
+        { }
 
         /**
          * Construct a histogram given the Lowest and Highest values to be tracked and a number of significant
@@ -176,8 +174,8 @@ namespace HdrHistogram
          *                                       maintain value resolution and separation. Must be a non-negative
          *                                       integer between 0 and 5.
          */
-        protected AbstractHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(numberOfSignificantValueDigits)
+        protected AbstractHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool autoResize)
+            : base(numberOfSignificantValueDigits, autoResize)
         {
             // Verify argument validity
             if (lowestDiscernibleValue < 1)
@@ -198,11 +196,10 @@ namespace HdrHistogram
          * @param source The source histogram to duplicate
          */
         protected AbstractHistogram(AbstractHistogram source)
-            : this(source.getLowestDiscernibleValue(), source.getHighestTrackableValue(), source.getNumberOfSignificantValueDigits())
+            : this(source.getLowestDiscernibleValue(), source.getHighestTrackableValue(), source.getNumberOfSignificantValueDigits(), source.autoResize)
         {
             this.setStartTimeStamp(source.getStartTimeStamp());
             this.setEndTimeStamp(source.getEndTimeStamp());
-            this.autoResize = source.autoResize;
         }
 
         private void init(long lowestDiscernibleValue,
@@ -261,22 +258,6 @@ namespace HdrHistogram
             //determine counts array length needed:
             int countsArrayLength = getLengthForNumberOfBuckets(getBucketsNeededToCoverValue(highestTrackableValue));
             return countsArrayLength;
-        }
-
-        //
-        //
-        // Auto-resizing control:
-        //
-        //
-
-        public bool isAutoResize()
-        {
-            return autoResize;
-        }
-
-        public virtual void setAutoResize(bool autoResize)
-        {
-            this.autoResize = autoResize;
         }
 
         //
@@ -546,7 +527,7 @@ namespace HdrHistogram
             long highestRecordableValue = highestEquivalentValue(valueFromIndex(countsArrayLength - 1));
             if (highestRecordableValue < otherHistogram.getMaxValue())
             {
-                if (!isAutoResize())
+                if (!autoResize)
                 {
                     throw new IndexOutOfRangeException("The other histogram includes values that do not fit in this histogram's range.");
                 }
@@ -604,7 +585,7 @@ namespace HdrHistogram
             long highestRecordableValue = valueFromIndex(countsArrayLength - 1);
             if (highestRecordableValue < otherHistogram.getMaxValue())
             {
-                if (!isAutoResize())
+                if (!autoResize)
                 {
                     throw new IndexOutOfRangeException("The other histogram includes values that do not fit in this histogram's range.");
                 }
@@ -1696,7 +1677,9 @@ namespace HdrHistogram
             minNonZeroValue.SetValue(indicatedMinNonZeroValue);
             startTimeStampMsec = indicatedStartTimeStampMsec;
             endTimeStampMsec = indicatedEndTimeStampMsec;
-            autoResize = indicatedAutoResize;
+
+            // TODO: serialization - autoResize is readonly
+            //autoResize = indicatedAutoResize;
         }
 
         //

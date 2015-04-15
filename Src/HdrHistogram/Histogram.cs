@@ -166,10 +166,8 @@ namespace HdrHistogram
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
         public Histogram(int numberOfSignificantValueDigits)
-            : this(1, 2, numberOfSignificantValueDigits)
-        {
-            setAutoResize(true);
-        }
+            : this(1, 2, numberOfSignificantValueDigits, allocateCountsArray: true, autoResize: true)
+        { }
 
         /**
          * Construct a Histogram given the Highest value to be tracked and a number of significant decimal digits. The
@@ -203,7 +201,7 @@ namespace HdrHistogram
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
         public Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : this(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, true)
+            : this(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: true, autoResize: false)
         {
         }
 
@@ -227,8 +225,8 @@ namespace HdrHistogram
             wordSizeInBytes = 8;
         }
 
-        protected Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool allocateCountsArray)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
+        protected Histogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits, bool allocateCountsArray, bool autoResize)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, autoResize)
         {
             if (allocateCountsArray)
             {

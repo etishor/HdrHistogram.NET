@@ -394,11 +394,6 @@ namespace HdrHistogram
             }
         }
 
-        public override void setAutoResize(bool autoResize)
-        {
-            this.autoResize = true;
-        }
-
         protected internal override void clearCounts()
         {
             try
@@ -470,7 +465,6 @@ namespace HdrHistogram
         public ConcurrentHistogram(int numberOfSignificantValueDigits)
             : this(1, 2, numberOfSignificantValueDigits)
         {
-            setAutoResize(true);
         }
 
         /**
@@ -507,7 +501,7 @@ namespace HdrHistogram
          */
         public ConcurrentHistogram(long lowestDiscernibleValue, long highestTrackableValue,
                                    int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, false)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: false, autoResize: true)
         {
             activeCounts = new AtomicLongArray(countsArrayLength);
             activeCountsNormalizingIndexOffset = 0;

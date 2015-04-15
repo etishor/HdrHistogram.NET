@@ -20,7 +20,7 @@ namespace HdrHistogram
     {
         private static AtomicLong constructionIdentityCount = new AtomicLong(0);
 
-        protected AbstractHistogramBase(int numberOfSignificantValueDigits)
+        protected AbstractHistogramBase(int numberOfSignificantValueDigits, bool autoResize)
         {
             if ((numberOfSignificantValueDigits < 0) || (numberOfSignificantValueDigits > 5))
             {
@@ -29,17 +29,18 @@ namespace HdrHistogram
 
             this.Identity = constructionIdentityCount.GetAndIncrement();
             this.NumberOfSignificantValueDigits = numberOfSignificantValueDigits;
+            this.autoResize = autoResize;
         }
 
         // "Cold" accessed fields. Not used in the recording code path:
         internal protected readonly long Identity;
         internal protected readonly int NumberOfSignificantValueDigits;
 
-        protected volatile bool autoResize = false;
+        protected readonly bool autoResize;
 
         internal protected long highestTrackableValue;
         protected long lowestDiscernibleValue;
-        
+
         protected internal int bucketCount;
         protected int subBucketCount;
         internal int countsArrayLength;

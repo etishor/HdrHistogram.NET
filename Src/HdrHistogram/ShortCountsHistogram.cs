@@ -164,9 +164,7 @@ namespace HdrHistogram
          */
         public ShortCountsHistogram(int numberOfSignificantValueDigits)
             : this(1, 2, numberOfSignificantValueDigits)
-        {
-            setAutoResize(true);
-        }
+        { }
 
         /**
          * Construct a ShortCountsHistogram given the Highest value to be tracked and a number of significant decimal digits. The
@@ -199,7 +197,7 @@ namespace HdrHistogram
          *                                       and separation. Must be a non-negative integer between 0 and 5.
          */
         public ShortCountsHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, autoResize: true)
         {
             counts = new short[countsArrayLength];
             wordSizeInBytes = 2;

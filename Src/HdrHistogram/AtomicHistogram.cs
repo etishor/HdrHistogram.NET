@@ -92,13 +92,6 @@ namespace HdrHistogram
                 " Use ConcurrentHistogram Instead.");
         }
 
-        public override void setAutoResize(bool autoResize)
-        {
-            throw new InvalidOperationException(
-                "AtomicHistogram does not support AutoResize operation." +
-                " Use ConcurrentHistogram Instead.");
-        }
-
         protected internal override void clearCounts()
         {
             for (int i = 0; i < counts.Length; i++)
@@ -181,7 +174,7 @@ namespace HdrHistogram
      */
 
         public AtomicHistogram(long lowestDiscernibleValue, long highestTrackableValue, int numberOfSignificantValueDigits)
-            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, false)
+            : base(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, allocateCountsArray: false, autoResize: false)
         {
             counts = new AtomicLongArray(countsArrayLength);
             wordSizeInBytes = 8;

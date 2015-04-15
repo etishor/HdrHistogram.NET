@@ -12,6 +12,7 @@ using Xunit;
 namespace HdrHistogram.Tests
 {
 
+    [Trait("Category", "Performance")]
     public class HistogramPerfTest
     {
         static readonly long highestTrackableValue = 3600L * 1000 * 1000; // e.g. for 1 hr in usec units
