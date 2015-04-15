@@ -41,7 +41,7 @@ namespace HdrHistogram
             this.histogram = histogram;
             this.savedHistogramTotalRawCount = histogram.getTotalCount();
             this.arrayTotalCount = histogram.getTotalCount();
-            this.integerToDoubleValueConversionRatio = histogram.getIntegerToDoubleValueConversionRatio();
+            this.integerToDoubleValueConversionRatio = histogram.integerToDoubleValueConversionRatio;
             this.currentIndex = 0;
             this.currentValueAtIndex = 0;
             this.nextValueAtIndex = 1 << histogram.unitMagnitude;

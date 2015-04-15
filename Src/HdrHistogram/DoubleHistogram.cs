@@ -199,7 +199,7 @@ namespace HdrHistogram
                     valuesHistogram = internalCountsHistogram;
                     // Derive initialLowestValueInAutoRange from valuesHistogram's integerToDoubleValueConversionRatio:
                     initialLowestValueInAutoRange =
-                        internalCountsHistogram.getIntegerToDoubleValueConversionRatio() *
+                        internalCountsHistogram.integerToDoubleValueConversionRatio *
                         internalCountsHistogram.subBucketHalfCount;
                 }
 
@@ -243,7 +243,7 @@ namespace HdrHistogram
             this.currentHighestValueLimitInAutoRange.SetValue(highestValueInAutoRange);
             this.integerToDoubleValueConversionRatio.SetValue(lowestValueInAutoRange / getLowestTrackingIntegerValue());
             this.doubleToIntegerValueConversionRatio.SetValue(1.0 / integerToDoubleValueConversionRatio.GetValue());
-            integerValuesHistogram.setIntegerToDoubleValueConversionRatio(integerToDoubleValueConversionRatio.GetValue());
+            integerValuesHistogram.integerToDoubleValueConversionRatio = integerToDoubleValueConversionRatio.GetValue();
         }
 
         //

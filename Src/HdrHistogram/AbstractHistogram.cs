@@ -12,35 +12,24 @@ using System.Runtime.CompilerServices;
 
 namespace HdrHistogram
 {
-
-    /**
-     * This non-public AbstractHistogramBase super-class separation is meant to bunch "cold" fields
-     * separately from "hot" fields, in an attempt to force the JVM to place the (hot) fields
-     * commonly used in the value recording code paths close together.
-     * Subclass boundaries tend to be strongly control memory layout decisions in most practical
-     * JVM implementations, making this an effective method for control filed grouping layout.
-     */
-
-    /**
-     * <h3>An abstract base class for integer values High Dynamic Range (HDR) Histograms</h3>
-     * <p>
-     * AbstractHistogram supports the recording and analyzing sampled data value counts across a configurable integer value
-     * range with configurable value precision within the range. Value precision is expressed as the number of significant
-     * digits in the value recording, and provides control over value quantization behavior across the value range and the
-     * subsequent value resolution at any given level.
-     * <p>
-     * For example, a Histogram could be configured to track the counts of observed integer values between 0 and
-     * 3,600,000,000 while maintaining a value precision of 3 significant digits across that range. Value quantization
-     * within the range will thus be no larger than 1/1,000th (or 0.1%) of any value. This example Histogram could
-     * be used to track and analyze the counts of observed response times ranging between 1 microsecond and 1 hour
-     * in magnitude, while maintaining a value resolution of 1 microsecond up to 1 millisecond, a resolution of
-     * 1 millisecond (or better) up to one second, and a resolution of 1 second (or better) up to 1,000 seconds. At it's
-     * maximum tracked value (1 hour), it would still maintain a resolution of 3.6 seconds (or better).
-     * <p>
-     * See package description for {@link org.HdrHistogram} for details.
-     *
-     */
-
+    /// <summary>
+    /// <h3>An abstract base class for integer values High Dynamic Range (HDR) Histograms</h3>
+    /// 
+    /// AbstractHistogram supports the recording and analyzing sampled data value counts across a configurable integer value
+    /// range with configurable value precision within the range. Value precision is expressed as the number of significant
+    /// digits in the value recording, and provides control over value quantization behavior across the value range and the
+    /// subsequent value resolution at any given level.
+    /// 
+    /// For example, a Histogram could be configured to track the counts of observed integer values between 0 and
+    /// 3,600,000,000 while maintaining a value precision of 3 significant digits across that range. Value quantization
+    /// within the range will thus be no larger than 1/1,000th (or 0.1%) of any value. This example Histogram could
+    /// be used to track and analyze the counts of observed response times ranging between 1 microsecond and 1 hour
+    /// in magnitude, while maintaining a value resolution of 1 microsecond up to 1 millisecond, a resolution of
+    /// 1 millisecond (or better) up to one second, and a resolution of 1 second (or better) up to 1,000 seconds. At it's
+    /// maximum tracked value (1 hour), it would still maintain a resolution of 3.6 seconds (or better).
+    /// 
+    /// See package description for {@link org.HdrHistogram} for details.
+    /// </summary>
     public abstract class AbstractHistogram : AbstractHistogramBase
     {
         public override int GetHashCode()
@@ -202,7 +191,6 @@ namespace HdrHistogram
             {
                 throw new ArgumentException("numberOfSignificantValueDigits must be between 0 and 5");
             }
-            identity = constructionIdentityCount.GetAndIncrement();
 
             init(lowestDiscernibleValue, highestTrackableValue, numberOfSignificantValueDigits, 1.0, 0);
         }
@@ -1803,7 +1791,7 @@ namespace HdrHistogram
             buffer.putInt(numberOfSignificantValueDigits);
             buffer.putLong(lowestDiscernibleValue);
             buffer.putLong(highestTrackableValue);
-            buffer.putDouble(getIntegerToDoubleValueConversionRatio());
+            buffer.putDouble(integerToDoubleValueConversionRatio);
 
             fillBufferFromCountsArray(buffer, relevantLength);
 
@@ -1923,7 +1911,7 @@ namespace HdrHistogram
             //histogram = constructor.newInstance(lowestTrackableUnitValue, highestTrackableValue,
             //        numberOfSignificantValueDigits);
 
-            histogram.setIntegerToDoubleValueConversionRatio(integerToDoubleValueConversionRatio);
+            histogram.integerToDoubleValueConversionRatio = integerToDoubleValueConversionRatio;
             histogram.setNormalizingIndexOffset(normalizingIndexOffset);
             if ((cookie != histogram.getEncodingCookie()) &&
                     (cookie != histogram.getV0EncodingCookie()))
