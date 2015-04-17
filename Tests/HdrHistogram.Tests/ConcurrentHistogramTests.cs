@@ -8,6 +8,7 @@
 using System;
 using System.Threading;
 using FluentAssertions;
+using HdrHistogram.ConcurrencyUtilities;
 using Xunit;
 
 namespace HdrHistogram.Tests

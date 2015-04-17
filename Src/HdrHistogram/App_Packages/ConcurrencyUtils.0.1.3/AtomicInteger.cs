@@ -1,202 +1,191 @@
+// This is a collection of .NET concurrency utilities, inspired by the classes
+// available in java. This utilities are written by Iulian Margarintescu as described here
+// https://github.com/etishor/ConcurrencyUtilities
+// 
+//
+// Striped64 & LongAdder classes were ported from Java and had this copyright:
+// 
+// Written by Doug Lea with assistance from members of JCP JSR-166
+// Expert Group and released to the public domain, as explained at
+// http://creativecommons.org/publicdomain/zero/1.0/
+// 
+// Source: http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.8
 
+//
+// By default all added classes are internal to your assembly. 
+// To make them public define you have to define the conditional compilation symbol CONCURRENCY_UTILS_PUBLIC in your project properties.
+//
 
-using System;
-using System.Collections.Generic;
+#pragma warning disable 1591
+
+// ReSharper disable All
+
 using System.Threading;
 
-namespace HdrHistogram
+namespace HdrHistogram.ConcurrencyUtilities
 {
     /// <summary>
-    /// Array of longs which provides atomic operations on the array elements. 
+    /// Atomic int value. Operations exposed on this class are performed using System.Threading.Interlocked class and are thread safe.
+    /// For AtomicInt values that are stored in arrays PaddedAtomicInt is recommended.
     /// </summary>
-    public struct AtomicLongArray
-#if INTERNAL_INTERFACES
- : AtomicArray<long>
+    /// <remarks>
+    /// The AtomicInteger is a struct not a class and members of this type should *not* be declared readonly or changes will not be reflected in the member instance. 
+    /// </remarks>
+#if CONCURRENCY_UTILS_PUBLIC
+public
+#else
+internal
 #endif
+    struct AtomicInteger
     {
-        private readonly long[] array;
+        private int value;
 
-        public AtomicLongArray(int length)
+        /// <summary>
+        /// Initializes a new instance with the specified <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">Initial value of the instance.</param>
+        public AtomicInteger(int value)
         {
-            if (length < 0)
-            {
-                throw new ArgumentException("Length must be positive", "length");
-            }
-            this.array = new long[length];
-        }
-
-        public AtomicLongArray(IReadOnlyList<long> source)
-        {
-            var clone = new long[source.Count];
-            for (var i = 0; i < source.Count; i++)
-            {
-                clone[i] = source[i];
-            }
-            this.array = clone;
-        }
-
-        public int Length
-        {
-            get { return this.array.Length; }
+            this.value = value;
         }
 
         /// <summary>
         /// Returns the latest value of this instance written by any processor.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <returns>The latest written value of this instance.</returns>
-        public long GetValue(int index)
+        public int GetValue()
         {
-            return Volatile.Read(ref this.array[index]);
+            return Volatile.Read(ref this.value);
         }
 
         /// <summary>
         /// Write a new value to this instance. The value is immediately seen by all processors.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <param name="value">The new value for this instance.</param>
-        public void SetValue(int index, long value)
+        public void SetValue(int value)
         {
-            Volatile.Write(ref this.array[index], value);
+            Volatile.Write(ref this.value, value);
         }
 
         /// <summary>
         /// Add <paramref name="value"/> to this instance and return the resulting value.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <param name="value">The amount to add.</param>
         /// <returns>The value of this instance + the amount added.</returns>
-        public long Add(int index, long value)
+        public int Add(int value)
         {
-            return Interlocked.Add(ref this.array[index], value);
+            return Interlocked.Add(ref this.value, value);
         }
 
         /// <summary>
         /// Add <paramref name="value"/> to this instance and return the value this instance had before the add operation.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <param name="value">The amount to add.</param>
         /// <returns>The value of this instance before the amount was added.</returns>
-        public long GetAndAdd(int index, long value)
+        public int GetAndAdd(int value)
         {
-            return Add(index, value) - value;
+            return Add(value) - value;
         }
 
         /// <summary>
         /// Increment this instance and return the value the instance had before the increment.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <returns>The value of the instance *before* the increment.</returns>
-        public long GetAndIncrement(int index)
+        public int GetAndIncrement()
         {
-            return Increment(index) - 1;
+            return Increment() - 1;
         }
 
         /// <summary>
         /// Increment this instance with <paramref name="value"/> and return the value the instance had before the increment.
         /// </summary>
-        /// <param name="index">index in the array</param>
-        /// <param name="value">value to increment with</param>
         /// <returns>The value of the instance *before* the increment.</returns>
-        public long GetAndIncrement(int index, long value)
+        public int GetAndIncrement(int value)
         {
-            return Increment(index, value) - value;
+            return Increment(value) - value;
         }
 
         /// <summary>
         /// Decrement this instance and return the value the instance had before the decrement.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <returns>The value of the instance *before* the decrement.</returns>
-        public long GetAndDecrement(int index)
+        public int GetAndDecrement()
         {
-            return Decrement(index) + 1;
+            return Decrement() + 1;
         }
 
         /// <summary>
         /// Decrement this instance with <paramref name="value"/> and return the value the instance had before the decrement.
         /// </summary>
-        /// <param name="index">index in the array</param>
-        /// <param name="value">value to decrement with</param>
         /// <returns>The value of the instance *before* the decrement.</returns>
-        public long GetAndDecrement(int index, long value)
+        public int GetAndDecrement(int value)
         {
-            return Decrement(index, value) + value;
+            return Decrement(value) + value;
         }
 
         /// <summary>
         /// Increment this instance and return the value after the increment.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <returns>The value of the instance *after* the increment.</returns>
-        public long Increment(int index)
+        public int Increment()
         {
-            return Interlocked.Increment(ref this.array[index]);
+            return Interlocked.Increment(ref this.value);
         }
 
         /// <summary>
         /// Increment this instance with <paramref name="value"/> and return the value after the increment.
         /// </summary>
-        /// <param name="index">index in the array</param>
-        /// <param name="value">value to increment with</param>
         /// <returns>The value of the instance *after* the increment.</returns>
-        public long Increment(int index, long value)
+        public int Increment(int value)
         {
-            return Add(index, value);
+            return Add(value);
         }
 
         /// <summary>
         /// Decrement this instance and return the value after the decrement.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <returns>The value of the instance *after* the decrement.</returns>
-        public long Decrement(int index)
+        public int Decrement()
         {
-            return Interlocked.Decrement(ref this.array[index]);
+            return Interlocked.Decrement(ref this.value);
         }
 
         /// <summary>
         /// Decrement this instance with <paramref name="value"/> and return the value after the decrement.
         /// </summary>
-        /// <param name="index">index in the array</param>
-        /// <param name="value">value to decrement with</param>
         /// <returns>The value of the instance *after* the decrement.</returns>
-        public long Decrement(int index, long value)
+        public int Decrement(int value)
         {
-            return Add(index, -value);
+            return Add(-value);
         }
 
         /// <summary>
         /// Returns the current value of the instance and sets it to zero as an atomic operation.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <returns>The current value of the instance.</returns>
-        public long GetAndReset(int index)
+        public int GetAndReset()
         {
-            return GetAndSet(index, 0L);
+            return GetAndSet(0);
         }
 
         /// <summary>
         /// Returns the current value of the instance and sets it to <paramref name="newValue"/> as an atomic operation.
         /// </summary>
-        /// <param name="index">index in the array</param>
-        /// <param name="newValue">value that will be set in the array at <paramref name="index"/></param>
         /// <returns>The current value of the instance.</returns>
-        public long GetAndSet(int index, long newValue)
+        public int GetAndSet(int newValue)
         {
-            return Interlocked.Exchange(ref this.array[index], newValue);
+            return Interlocked.Exchange(ref this.value, newValue);
         }
 
         /// <summary>
         /// Replace the value of this instance, if the current value is equal to the <paramref name="expected"/> value.
         /// </summary>
-        /// <param name="index">index in the array</param>
         /// <param name="expected">Value this instance is expected to be equal with.</param>
         /// <param name="updated">Value to set this instance to, if the current value is equal to the expected value</param>
         /// <returns>True if the update was made, false otherwise.</returns>
-        public bool CompareAndSwap(int index, long expected, long updated)
+        public bool CompareAndSwap(int expected, int updated)
         {
-            return Interlocked.CompareExchange(ref this.array[index], updated, expected) == expected;
+            return Interlocked.CompareExchange(ref this.value, updated, expected) == expected;
         }
     }
 }

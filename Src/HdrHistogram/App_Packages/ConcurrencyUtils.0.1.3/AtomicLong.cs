@@ -1,26 +1,50 @@
+// This is a collection of .NET concurrency utilities, inspired by the classes
+// available in java. This utilities are written by Iulian Margarintescu as described here
+// https://github.com/etishor/ConcurrencyUtilities
+// 
+//
+// Striped64 & LongAdder classes were ported from Java and had this copyright:
+// 
+// Written by Doug Lea with assistance from members of JCP JSR-166
+// Expert Group and released to the public domain, as explained at
+// http://creativecommons.org/publicdomain/zero/1.0/
+// 
+// Source: http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.8
+
+//
+// By default all added classes are internal to your assembly. 
+// To make them public define you have to define the conditional compilation symbol CONCURRENCY_UTILS_PUBLIC in your project properties.
+//
+
+#pragma warning disable 1591
+
+// ReSharper disable All
+
 using System.Threading;
 
-namespace HdrHistogram
+namespace HdrHistogram.ConcurrencyUtilities
 {
     /// <summary>
-    /// Atomic int value. Operations exposed on this class are performed using System.Threading.Interlocked class and are thread safe.
-    /// For AtomicInt values that are stored in arrays PaddedAtomicInt is recommended.
+    /// Atomic long value. Operations exposed on this class are performed using System.Threading.Interlocked class and are thread safe.
+    /// For AtomicLong values that are stored in arrays PaddedAtomicLong is recommended.
     /// </summary>
     /// <remarks>
-    /// The AtomicInteger is a struct not a class and members of this type should *not* be declared readonly or changes will not be reflected in the member instance. 
+    /// The AtomicLong is a struct not a class and members of this type should *not* be declared readonly or changes will not be reflected in the member instance. 
     /// </remarks>
-    public struct AtomicInteger
-#if INTERNAL_INTERFACES
- : AtomicValue<int>, ValueAdder<int>
+#if CONCURRENCY_UTILS_PUBLIC
+public
+#else
+internal
 #endif
+    struct AtomicLong
     {
-        private int value;
+        private long value;
 
         /// <summary>
         /// Initializes a new instance with the specified <paramref name="value"/>.
         /// </summary>
         /// <param name="value">Initial value of the instance.</param>
-        public AtomicInteger(int value)
+        public AtomicLong(long value)
         {
             this.value = value;
         }
@@ -29,7 +53,7 @@ namespace HdrHistogram
         /// Returns the latest value of this instance written by any processor.
         /// </summary>
         /// <returns>The latest written value of this instance.</returns>
-        public int GetValue()
+        public long GetValue()
         {
             return Volatile.Read(ref this.value);
         }
@@ -38,7 +62,7 @@ namespace HdrHistogram
         /// Write a new value to this instance. The value is immediately seen by all processors.
         /// </summary>
         /// <param name="value">The new value for this instance.</param>
-        public void SetValue(int value)
+        public void SetValue(long value)
         {
             Volatile.Write(ref this.value, value);
         }
@@ -48,7 +72,7 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="value">The amount to add.</param>
         /// <returns>The value of this instance + the amount added.</returns>
-        public int Add(int value)
+        public long Add(long value)
         {
             return Interlocked.Add(ref this.value, value);
         }
@@ -58,7 +82,7 @@ namespace HdrHistogram
         /// </summary>
         /// <param name="value">The amount to add.</param>
         /// <returns>The value of this instance before the amount was added.</returns>
-        public int GetAndAdd(int value)
+        public long GetAndAdd(long value)
         {
             return Add(value) - value;
         }
@@ -67,7 +91,7 @@ namespace HdrHistogram
         /// Increment this instance and return the value the instance had before the increment.
         /// </summary>
         /// <returns>The value of the instance *before* the increment.</returns>
-        public int GetAndIncrement()
+        public long GetAndIncrement()
         {
             return Increment() - 1;
         }
@@ -76,7 +100,7 @@ namespace HdrHistogram
         /// Increment this instance with <paramref name="value"/> and return the value the instance had before the increment.
         /// </summary>
         /// <returns>The value of the instance *before* the increment.</returns>
-        public int GetAndIncrement(int value)
+        public long GetAndIncrement(long value)
         {
             return Increment(value) - value;
         }
@@ -85,7 +109,7 @@ namespace HdrHistogram
         /// Decrement this instance and return the value the instance had before the decrement.
         /// </summary>
         /// <returns>The value of the instance *before* the decrement.</returns>
-        public int GetAndDecrement()
+        public long GetAndDecrement()
         {
             return Decrement() + 1;
         }
@@ -94,7 +118,7 @@ namespace HdrHistogram
         /// Decrement this instance with <paramref name="value"/> and return the value the instance had before the decrement.
         /// </summary>
         /// <returns>The value of the instance *before* the decrement.</returns>
-        public int GetAndDecrement(int value)
+        public long GetAndDecrement(long value)
         {
             return Decrement(value) + value;
         }
@@ -103,7 +127,7 @@ namespace HdrHistogram
         /// Increment this instance and return the value after the increment.
         /// </summary>
         /// <returns>The value of the instance *after* the increment.</returns>
-        public int Increment()
+        public long Increment()
         {
             return Interlocked.Increment(ref this.value);
         }
@@ -112,7 +136,7 @@ namespace HdrHistogram
         /// Increment this instance with <paramref name="value"/> and return the value after the increment.
         /// </summary>
         /// <returns>The value of the instance *after* the increment.</returns>
-        public int Increment(int value)
+        public long Increment(long value)
         {
             return Add(value);
         }
@@ -121,7 +145,7 @@ namespace HdrHistogram
         /// Decrement this instance and return the value after the decrement.
         /// </summary>
         /// <returns>The value of the instance *after* the decrement.</returns>
-        public int Decrement()
+        public long Decrement()
         {
             return Interlocked.Decrement(ref this.value);
         }
@@ -130,7 +154,7 @@ namespace HdrHistogram
         /// Decrement this instance with <paramref name="value"/> and return the value after the decrement.
         /// </summary>
         /// <returns>The value of the instance *after* the decrement.</returns>
-        public int Decrement(int value)
+        public long Decrement(long value)
         {
             return Add(-value);
         }
@@ -139,16 +163,16 @@ namespace HdrHistogram
         /// Returns the current value of the instance and sets it to zero as an atomic operation.
         /// </summary>
         /// <returns>The current value of the instance.</returns>
-        public int GetAndReset()
+        public long GetAndReset()
         {
-            return GetAndSet(0);
+            return GetAndSet(0L);
         }
 
         /// <summary>
         /// Returns the current value of the instance and sets it to <paramref name="newValue"/> as an atomic operation.
         /// </summary>
         /// <returns>The current value of the instance.</returns>
-        public int GetAndSet(int newValue)
+        public long GetAndSet(long newValue)
         {
             return Interlocked.Exchange(ref this.value, newValue);
         }
@@ -159,20 +183,9 @@ namespace HdrHistogram
         /// <param name="expected">Value this instance is expected to be equal with.</param>
         /// <param name="updated">Value to set this instance to, if the current value is equal to the expected value</param>
         /// <returns>True if the update was made, false otherwise.</returns>
-        public bool CompareAndSwap(int expected, int updated)
+        public bool CompareAndSwap(long expected, long updated)
         {
             return Interlocked.CompareExchange(ref this.value, updated, expected) == expected;
         }
-
-#if INTERNAL_INTERFACES
-        int ValueAdder<int>.GetAndReset() { return this.GetAndReset(); }
-        void ValueAdder<int>.Add(int value) { this.Add(value); }
-        void ValueAdder<int>.Increment() { this.Increment(); }
-        void ValueAdder<int>.Increment(int value) { this.Increment(value); }
-        void ValueAdder<int>.Decrement() { this.Decrement(); }
-        void ValueAdder<int>.Decrement(int value) { this.Decrement(value); }
-        void ValueAdder<int>.Reset() { this.SetValue(0); }
-        int ValueReader<int>.GetValue() { return this.GetValue(); }
-#endif
     }
 }
