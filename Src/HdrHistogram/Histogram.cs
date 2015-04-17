@@ -95,7 +95,6 @@ namespace HdrHistogram
         protected internal override void clearCounts()
         {
             Array.Clear(counts, 0, counts.Length);
-            //java.util.Arrays.fill(counts, 0);
             totalCount = 0;
         }
 

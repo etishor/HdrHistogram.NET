@@ -51,7 +51,7 @@ namespace HdrHistogram
 
     public class DoubleHistogram : EncodableHistogram
     {
-        private static double highestAllowedValueEver; // A value that will keep us from multiplying into infinity.
+        private static readonly double highestAllowedValueEver; // A value that will keep us from multiplying into infinity.
 
         private long configuredHighestToLowestValueRatio;
 
