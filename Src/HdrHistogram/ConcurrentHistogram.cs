@@ -56,7 +56,7 @@ namespace HdrHistogram
                 wrp.readerLock();
                 Debug.Assert(countsArrayLength == activeCounts.Length);
                 Debug.Assert(countsArrayLength == inactiveCounts.Length);
-                ;
+
                 long activeCount = activeCounts.GetValue(normalizeIndex(index, activeCountsNormalizingIndexOffset, activeCounts.Length));
                 long inactiveCount = inactiveCounts.GetValue(normalizeIndex(index, inactiveCountsNormalizingIndexOffset, inactiveCounts.Length));
                 return activeCount + inactiveCount;
