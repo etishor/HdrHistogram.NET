@@ -320,11 +320,12 @@ namespace HdrHistogram
 
         private void updateMinAndMax(long value)
         {
-            if (value > maxValue.GetValue())
+            // we can use non volatile get as the update method checks again
+            if (value > maxValue.NonVolatileGetValue())
             {
                 updatedMaxValue(value);
             }
-            if ((value < minNonZeroValue.GetValue()) && (value != 0))
+            if ((value < minNonZeroValue.NonVolatileGetValue()) && (value != 0))
             {
                 updateMinNonZeroValue(value);
             }
