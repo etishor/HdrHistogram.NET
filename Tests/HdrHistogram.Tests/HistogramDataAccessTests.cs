@@ -535,8 +535,8 @@ namespace HdrHistogram.Tests
                         " is exactly the amount added since the last iteration ",
                         v.getCountAtValueIteratedTo(), v.getCountAddedInThisIterationStep());
                 totalAddedCounts += v.getCountAddedInThisIterationStep();
-                Assert.True(histogram.valuesAreEquivalent(histogram.valueFromIndex(index), v.getValueIteratedTo()),
-                    "valueFromIndex(index) should be equal to getValueIteratedTo()");
+                Assert.True(histogram.valuesAreEquivalent(histogram.ValueFromIndex(index), v.getValueIteratedTo()),
+                    "ValueFromIndex(index) should be equal to getValueIteratedTo()");
                 index++;
             }
             AssertEqual("index should be equal to countsArrayLength", histogram.countsArrayLength, index);

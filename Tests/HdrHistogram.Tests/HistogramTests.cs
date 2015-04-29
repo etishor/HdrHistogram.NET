@@ -57,7 +57,7 @@ namespace HdrHistogram.Tests
             {
                 if (histogram.getCountAtIndex(i) > 0)
                 {
-                    computedMaxValue = histogram.valueFromIndex(i);
+                    computedMaxValue = histogram.ValueFromIndex(i);
                 }
             }
             computedMaxValue = (computedMaxValue == 0) ? 0 : histogram.highestEquivalentValue(computedMaxValue);
