@@ -114,7 +114,7 @@ namespace HdrHistogram.Tests
                         // wait for doRun to be set.
                     }
                     histogram.resize(nextValue);
-                    histogram.recordValue(nextValue);
+                    histogram.RecordValue(nextValue);
                     count++;
                 }
             }

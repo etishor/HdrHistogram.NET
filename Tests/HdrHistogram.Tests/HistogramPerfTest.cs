@@ -37,13 +37,13 @@ namespace HdrHistogram.Tests
         void recordLoopWithExpectedInterval(AbstractHistogram histogram, long loopCount, long expectedInterval)
         {
             for (long i = 0; i < loopCount; i++)
-                histogram.recordValueWithExpectedInterval(testValueLevel + (i & 0x8000), expectedInterval);
+                histogram.RecordValueWithExpectedInterval(testValueLevel + (i & 0x8000), expectedInterval);
         }
 
         void recordLoopWithExpectedInterval(Recorder histogram, long loopCount, long expectedInterval)
         {
             for (long i = 0; i < loopCount; i++)
-                histogram.recordValueWithExpectedInterval(testValueLevel + (i & 0x8000), expectedInterval);
+                histogram.RecordValueWithExpectedInterval(testValueLevel + (i & 0x8000), expectedInterval);
         }
 
         void recordLoopWithExpectedInterval(SingleWriterRecorder histogram, long loopCount, long expectedInterval)
@@ -130,7 +130,7 @@ namespace HdrHistogram.Tests
             long rate = 1000000 * warmupLoopLength / deltaUsec;
             Console.WriteLine(label + "Warmup: " + warmupLoopLength + " value recordings completed in " +
                     deltaUsec + " usec, rate = " + rate + " value recording calls per sec.");
-            intervalHistogram.reset();
+            intervalHistogram.Reset();
             // Wait a bit to make sure compiler had a cache to do it's stuff:
             Thread.Sleep(1000);
 
@@ -142,7 +142,7 @@ namespace HdrHistogram.Tests
             Console.WriteLine(label + "Hot code timing:");
             Console.WriteLine(label + timingLoopCount + " value recordings completed in " +
                     deltaUsec + " usec, rate = " + rate + " value recording calls per sec.");
-            Histogram histogram = intervalHistogram.getIntervalHistogram();
+            Histogram histogram = intervalHistogram.GetIntervalHistogram();
             rate = 1000000 * histogram.getTotalCount() / deltaUsec;
             Console.WriteLine(label + histogram.getTotalCount() + " raw recorded entries completed in " +
                     deltaUsec + " usec, rate = " + rate + " recorded values per sec.");

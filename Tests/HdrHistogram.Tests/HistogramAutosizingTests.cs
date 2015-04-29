@@ -16,10 +16,10 @@ namespace HdrHistogram.Tests
         public void testHistogramAutoSizingEdges()
         {
             Histogram histogram = new Histogram(3);
-            histogram.recordValue((1L << 62) - 1);
+            histogram.RecordValue((1L << 62) - 1);
             Assert.Equal(52, histogram.bucketCount);
             Assert.Equal(54272, histogram.countsArrayLength);
-            histogram.recordValue(long.MaxValue);
+            histogram.RecordValue(long.MaxValue);
             Assert.Equal(53, histogram.bucketCount);
             Assert.Equal(55296, histogram.countsArrayLength);
         }
@@ -31,7 +31,7 @@ namespace HdrHistogram.Tests
             for (int i = 0; i < 63; i++)
             {
                 long value = 1L << i;
-                histogram.recordValue(value);
+                histogram.RecordValue(value);
             }
             Assert.Equal(53, histogram.bucketCount);
             Assert.Equal(55296, histogram.countsArrayLength);
@@ -44,7 +44,7 @@ namespace HdrHistogram.Tests
             for (int i = 9; i < 63; i++)
             {
                 long value = 1L << i;
-                histogram.recordValue(value);
+                histogram.RecordValue(value);
             }
         }
 
@@ -55,7 +55,7 @@ namespace HdrHistogram.Tests
             for (int i = 0; i < 63; i++)
             {
                 long value = 1L << i;
-                histogram.recordValue(value);
+                histogram.RecordValue(value);
             }
         }
 
@@ -66,7 +66,7 @@ namespace HdrHistogram.Tests
             for (int i = 0; i < 63; i++)
             {
                 long value = 1L << i;
-                histogram.recordValue(value);
+                histogram.RecordValue(value);
             }
         }
 
@@ -77,7 +77,7 @@ namespace HdrHistogram.Tests
             for (int i = 0; i < 63; i++)
             {
                 long value = 1L << i;
-                histogram.recordValue(value);
+                histogram.RecordValue(value);
             }
         }
 
@@ -87,8 +87,8 @@ namespace HdrHistogram.Tests
             Histogram histogram1 = new Histogram(2);
             Histogram histogram2 = new Histogram(2);
 
-            histogram1.recordValue(1000L);
-            histogram1.recordValue(1000000000L);
+            histogram1.RecordValue(1000L);
+            histogram1.RecordValue(1000000000L);
 
             histogram2.add(histogram1);
 
@@ -102,7 +102,7 @@ namespace HdrHistogram.Tests
 
             for (long i = 0; i < 10000000L; i++)
             {
-                histogram.recordValue(i);
+                histogram.RecordValue(i);
             }
         }
 
@@ -113,7 +113,7 @@ namespace HdrHistogram.Tests
 
             for (long i = 0; i < 1000000L; i++)
             {
-                histogram.recordValue(i);
+                histogram.RecordValue(i);
             }
         }
 

@@ -311,9 +311,9 @@ namespace HdrHistogram.Tests
 
         //private void testDoubleHistogramSerialization(DoubleHistogram histogram)
         //{
-        //    histogram.recordValue(testValueLevel);
-        //    histogram.recordValue(testValueLevel*10);
-        //    histogram.recordValueWithExpectedInterval(histogram.getCurrentHighestTrackableValue() - 1, histogram.getCurrentHighestTrackableValue()/1000);
+        //    histogram.RecordValue(testValueLevel);
+        //    histogram.RecordValue(testValueLevel*10);
+        //    histogram.RecordValueWithExpectedInterval(histogram.getCurrentHighestTrackableValue() - 1, histogram.getCurrentHighestTrackableValue()/1000);
         //    ByteArrayOutputStream bos = new ByteArrayOutputStream();
         //    ObjectOutput out =
         //    null;

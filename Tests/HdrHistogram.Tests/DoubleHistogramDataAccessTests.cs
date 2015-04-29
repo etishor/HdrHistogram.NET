@@ -233,7 +233,7 @@ namespace HdrHistogram.Tests
         {
             long largestValue = 1000000000000L;
             Histogram h = new Histogram(largestValue, 5);
-            h.recordValue(largestValue);
+            h.RecordValue(largestValue);
 
             Assert.True(h.getValueAtPercentile(100.0) > 0);
         }

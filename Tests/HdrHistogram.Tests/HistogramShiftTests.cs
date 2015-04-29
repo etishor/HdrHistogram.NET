@@ -73,28 +73,28 @@ namespace HdrHistogram.Tests
             for (int shiftAmount = 0; shiftAmount < 10; shiftAmount++)
             {
                 histogram.reset();
-                histogram.recordValueWithCount(0, 500);
-                histogram.recordValue(2);
-                histogram.recordValue(4);
-                histogram.recordValue(5);
-                histogram.recordValue(511);
-                histogram.recordValue(512);
-                histogram.recordValue(1023);
-                histogram.recordValue(1024);
-                histogram.recordValue(1025);
+                histogram.RecordValueWithCount(0, 500);
+                histogram.RecordValue(2);
+                histogram.RecordValue(4);
+                histogram.RecordValue(5);
+                histogram.RecordValue(511);
+                histogram.RecordValue(512);
+                histogram.RecordValue(1023);
+                histogram.RecordValue(1024);
+                histogram.RecordValue(1025);
 
                 AbstractHistogram histogram2 = histogram.copy();
 
                 histogram2.reset();
-                histogram2.recordValueWithCount(0, 500);
-                histogram2.recordValue(2 << shiftAmount);
-                histogram2.recordValue(4 << shiftAmount);
-                histogram2.recordValue(5 << shiftAmount);
-                histogram2.recordValue(511 << shiftAmount);
-                histogram2.recordValue(512 << shiftAmount);
-                histogram2.recordValue(1023 << shiftAmount);
-                histogram2.recordValue(1024 << shiftAmount);
-                histogram2.recordValue(1025 << shiftAmount);
+                histogram2.RecordValueWithCount(0, 500);
+                histogram2.RecordValue(2 << shiftAmount);
+                histogram2.RecordValue(4 << shiftAmount);
+                histogram2.RecordValue(5 << shiftAmount);
+                histogram2.RecordValue(511 << shiftAmount);
+                histogram2.RecordValue(512 << shiftAmount);
+                histogram2.RecordValue(1023 << shiftAmount);
+                histogram2.RecordValue(1024 << shiftAmount);
+                histogram2.RecordValue(1025 << shiftAmount);
 
                 histogram.shiftValuesLeft(shiftAmount);
 
@@ -107,29 +107,29 @@ namespace HdrHistogram.Tests
             for (int shiftAmount = 0; shiftAmount < 10; shiftAmount++)
             {
                 histogram.reset();
-                histogram.recordValueWithCount(0, 500);
-                histogram.recordValue(2 << 10);
-                histogram.recordValue(4 << 10);
-                histogram.recordValue(5 << 10);
-                histogram.recordValue(511 << 10);
-                histogram.recordValue(512 << 10);
-                histogram.recordValue(1023 << 10);
-                histogram.recordValue(1024 << 10);
-                histogram.recordValue(1025 << 10);
+                histogram.RecordValueWithCount(0, 500);
+                histogram.RecordValue(2 << 10);
+                histogram.RecordValue(4 << 10);
+                histogram.RecordValue(5 << 10);
+                histogram.RecordValue(511 << 10);
+                histogram.RecordValue(512 << 10);
+                histogram.RecordValue(1023 << 10);
+                histogram.RecordValue(1024 << 10);
+                histogram.RecordValue(1025 << 10);
 
                 AbstractHistogram origHistogram = histogram.copy();
                 AbstractHistogram histogram2 = histogram.copy();
 
                 histogram2.reset();
-                histogram2.recordValueWithCount(0, 500);
-                histogram2.recordValue((2 << 10) << shiftAmount);
-                histogram2.recordValue((4 << 10) << shiftAmount);
-                histogram2.recordValue((5 << 10) << shiftAmount);
-                histogram2.recordValue((511 << 10) << shiftAmount);
-                histogram2.recordValue((512 << 10) << shiftAmount);
-                histogram2.recordValue((1023 << 10) << shiftAmount);
-                histogram2.recordValue((1024 << 10) << shiftAmount);
-                histogram2.recordValue((1025 << 10) << shiftAmount);
+                histogram2.RecordValueWithCount(0, 500);
+                histogram2.RecordValue((2 << 10) << shiftAmount);
+                histogram2.RecordValue((4 << 10) << shiftAmount);
+                histogram2.RecordValue((5 << 10) << shiftAmount);
+                histogram2.RecordValue((511 << 10) << shiftAmount);
+                histogram2.RecordValue((512 << 10) << shiftAmount);
+                histogram2.RecordValue((1023 << 10) << shiftAmount);
+                histogram2.RecordValue((1024 << 10) << shiftAmount);
+                histogram2.RecordValue((1025 << 10) << shiftAmount);
 
                 histogram.shiftValuesLeft(shiftAmount);
 

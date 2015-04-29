@@ -32,9 +32,9 @@ namespace HdrHistogram.Tests
 
             for (int i = 0; i < 10000; i++)
             {
-                histogram.recordValue(3000 * i);
-                recorder1.recordValue(3000 * i);
-                recorder2.recordValue(3000 * i);
+                histogram.RecordValue(3000 * i);
+                recorder1.RecordValue(3000 * i);
+                recorder2.RecordValue(3000 * i);
                 doubleHistogram.recordValue(5000 * i);
                 doubleRecorder1.recordValue(5000 * i);
                 doubleRecorder2.recordValue(5000 * i);
@@ -43,10 +43,10 @@ namespace HdrHistogram.Tests
                 doubleRecorder2.recordValue(0.001); // Makes some internal shifts happen.
             }
 
-            Histogram histogram2 = recorder1.getIntervalHistogram();
+            Histogram histogram2 = recorder1.GetIntervalHistogram();
             histogram2.Equals(histogram).Should().BeTrue();
 
-            recorder2.getIntervalHistogramInto(histogram2);
+            recorder2.GetIntervalHistogramInto(histogram2);
             histogram2.Equals(histogram).Should().BeTrue();
 
             DoubleHistogram doubleHistogram2 = doubleRecorder1.getIntervalHistogram();
@@ -57,9 +57,9 @@ namespace HdrHistogram.Tests
 
             for (int i = 0; i < 5000; i++)
             {
-                histogram.recordValue(3000 * i);
-                recorder1.recordValue(3000 * i);
-                recorder2.recordValue(3000 * i);
+                histogram.RecordValue(3000 * i);
+                recorder1.RecordValue(3000 * i);
+                recorder2.RecordValue(3000 * i);
                 doubleHistogram.recordValue(5000 * i);
                 doubleRecorder1.recordValue(5000 * i);
                 doubleRecorder2.recordValue(5000 * i);
@@ -68,7 +68,7 @@ namespace HdrHistogram.Tests
                 doubleRecorder2.recordValue(0.001);
             }
 
-            Histogram histogram3 = recorder1.getIntervalHistogram();
+            Histogram histogram3 = recorder1.GetIntervalHistogram();
 
             Histogram sumHistogram = histogram2.copy() as Histogram;
             sumHistogram.add(histogram3);
@@ -80,14 +80,14 @@ namespace HdrHistogram.Tests
             sumDoubleHistogram.add(doubleHistogram3);
             sumDoubleHistogram.Equals(doubleHistogram).Should().BeTrue();
 
-            recorder2.getIntervalHistogram();
+            recorder2.GetIntervalHistogram();
             doubleRecorder2.getIntervalHistogram();
 
             for (int i = 5000; i < 10000; i++)
             {
-                histogram.recordValue(3000 * i);
-                recorder1.recordValue(3000 * i);
-                recorder2.recordValue(3000 * i);
+                histogram.RecordValue(3000 * i);
+                recorder1.RecordValue(3000 * i);
+                recorder2.RecordValue(3000 * i);
                 doubleHistogram.recordValue(5000 * i);
                 doubleRecorder1.recordValue(5000 * i);
                 doubleRecorder2.recordValue(5000 * i);
@@ -96,11 +96,11 @@ namespace HdrHistogram.Tests
                 doubleRecorder2.recordValue(0.001);
             }
 
-            Histogram histogram4 = recorder1.getIntervalHistogram();
+            Histogram histogram4 = recorder1.GetIntervalHistogram();
             histogram4.add(histogram3);
             Assert.Equal(histogram4, histogram2);
 
-            recorder2.getIntervalHistogramInto(histogram4);
+            recorder2.GetIntervalHistogramInto(histogram4);
             histogram4.add(histogram3);
             Assert.Equal(histogram4, histogram2);
 
@@ -118,7 +118,7 @@ namespace HdrHistogram.Tests
         public void testSimpleAutosizingRecorder()
         {
             Recorder recorder = new Recorder(3);
-            Histogram histogram = recorder.getIntervalHistogram();
+            Histogram histogram = recorder.GetIntervalHistogram();
             histogram.Should().NotBeNull();
         }
 

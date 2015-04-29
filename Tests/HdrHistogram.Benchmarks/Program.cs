@@ -11,7 +11,7 @@ namespace HdrHistogram.Benchmarks
             //BenchmarkRunner.Run("Noop", () => { });
 
             var histogram = new Histogram(100, 2);
-            BenchmarkRunner.Run("Histogram", () => histogram.recordValue(1));
+            BenchmarkRunner.Run("Histogram", () => histogram.RecordValue(1));
 
         }
     }

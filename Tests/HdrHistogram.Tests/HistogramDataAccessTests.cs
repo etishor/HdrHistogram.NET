@@ -37,15 +37,15 @@ namespace HdrHistogram.Tests
             // interval between samples of 10 msec:
             for (int i = 0; i < 10000; i++)
             {
-                histogram.recordValueWithExpectedInterval(1000 /* 1 msec */, 10000 /* 10 msec expected interval */);
-                scaledHistogram.recordValueWithExpectedInterval(1000 * 512 /* 1 msec */, 10000 * 512 /* 10 msec expected interval */);
-                rawHistogram.recordValue(1000 /* 1 msec */);
-                scaledRawHistogram.recordValue(1000 * 512/* 1 msec */);
+                histogram.RecordValueWithExpectedInterval(1000 /* 1 msec */, 10000 /* 10 msec expected interval */);
+                scaledHistogram.RecordValueWithExpectedInterval(1000 * 512 /* 1 msec */, 10000 * 512 /* 10 msec expected interval */);
+                rawHistogram.RecordValue(1000 /* 1 msec */);
+                scaledRawHistogram.RecordValue(1000 * 512/* 1 msec */);
             }
-            histogram.recordValueWithExpectedInterval(100000000L /* 100 sec */, 10000 /* 10 msec expected interval */);
-            scaledHistogram.recordValueWithExpectedInterval(100000000L * 512 /* 100 sec */, 10000 * 512 /* 10 msec expected interval */);
-            rawHistogram.recordValue(100000000L /* 100 sec */);
-            scaledRawHistogram.recordValue(100000000L * 512 /* 100 sec */);
+            histogram.RecordValueWithExpectedInterval(100000000L /* 100 sec */, 10000 /* 10 msec expected interval */);
+            scaledHistogram.RecordValueWithExpectedInterval(100000000L * 512 /* 100 sec */, 10000 * 512 /* 10 msec expected interval */);
+            rawHistogram.RecordValue(100000000L /* 100 sec */);
+            scaledRawHistogram.RecordValue(100000000L * 512 /* 100 sec */);
 
             postCorrectedHistogram = rawHistogram.copyCorrectedForCoordinatedOmission(10000 /* 10 msec expected interval */) as Histogram;
             postCorrectedScaledHistogram = scaledRawHistogram.copyCorrectedForCoordinatedOmission(10000 * 512 /* 10 msec expected interval */) as Histogram;
@@ -229,7 +229,7 @@ namespace HdrHistogram.Tests
         {
             long largestValue = 1000000000000L;
             Histogram h = new Histogram(largestValue, 5);
-            h.recordValue(largestValue);
+            h.RecordValue(largestValue);
 
             Assert.True(h.getValueAtPercentile(100.0) > 0);
         }
@@ -566,7 +566,7 @@ namespace HdrHistogram.Tests
             AbstractHistogram histogram2 = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
             for (int i = 0; i < ranges.Count; ++i)
             {
-                histogram2.recordValueWithCount(ranges[i], counts[i]);
+                histogram2.RecordValueWithCount(ranges[i], counts[i]);
             }
 
             Assert.True(histogram1.Equals(histogram2), "Histograms should be equal");

@@ -169,7 +169,7 @@ namespace HdrHistogram.Tests
         public void testRecordValue()
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel);
             Assert.Equal(1L, histogram.getCountAtValue(testValueLevel));
             Assert.Equal(1L, histogram.getTotalCount());
             verifyMaxValue(histogram);
@@ -181,7 +181,7 @@ namespace HdrHistogram.Tests
             Action action = () =>
             {
                 Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-                histogram.recordValue(highestTrackableValue * 3);
+                histogram.RecordValue(highestTrackableValue * 3);
             };
 
             action.ShouldThrow<IndexOutOfRangeException>();
@@ -191,9 +191,9 @@ namespace HdrHistogram.Tests
         public void testConstructionWithLargeNumbers()
         {
             Histogram histogram = new Histogram(20000000, 100000000, 5);
-            histogram.recordValue(100000000);
-            histogram.recordValue(20000000);
-            histogram.recordValue(30000000);
+            histogram.RecordValue(100000000);
+            histogram.RecordValue(20000000);
+            histogram.RecordValue(30000000);
             Assert.True(histogram.valuesAreEquivalent(20000000, histogram.getValueAtPercentile(50.0)));
             Assert.True(histogram.valuesAreEquivalent(30000000, histogram.getValueAtPercentile(83.33)));
             Assert.True(histogram.valuesAreEquivalent(100000000, histogram.getValueAtPercentile(83.34)));
@@ -207,9 +207,9 @@ namespace HdrHistogram.Tests
         public void testRecordValueWithExpectedInterval()
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValueWithExpectedInterval(testValueLevel, testValueLevel / 4);
+            histogram.RecordValueWithExpectedInterval(testValueLevel, testValueLevel / 4);
             Histogram rawHistogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            rawHistogram.recordValue(testValueLevel);
+            rawHistogram.RecordValue(testValueLevel);
             // The data will include corrected samples:
             Assert.Equal(1L, histogram.getCountAtValue((testValueLevel * 1) / 4));
             Assert.Equal(1L, histogram.getCountAtValue((testValueLevel * 2) / 4));
@@ -230,7 +230,7 @@ namespace HdrHistogram.Tests
         public void testReset()
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel);
             histogram.reset();
             Assert.Equal(0L, histogram.getCountAtValue(testValueLevel));
             Assert.Equal(0L, histogram.getTotalCount());
@@ -242,19 +242,19 @@ namespace HdrHistogram.Tests
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
             Histogram other = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
-            histogram.recordValue(testValueLevel * 1000);
-            other.recordValue(testValueLevel);
-            other.recordValue(testValueLevel * 1000);
+            histogram.RecordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel * 1000);
+            other.RecordValue(testValueLevel);
+            other.RecordValue(testValueLevel * 1000);
             histogram.add(other);
             Assert.Equal(2L, histogram.getCountAtValue(testValueLevel));
             Assert.Equal(2L, histogram.getCountAtValue(testValueLevel * 1000));
             Assert.Equal(4L, histogram.getTotalCount());
 
             Histogram biggerOther = new Histogram(highestTrackableValue * 2, numberOfSignificantValueDigits);
-            biggerOther.recordValue(testValueLevel);
-            biggerOther.recordValue(testValueLevel * 1000);
-            biggerOther.recordValue(highestTrackableValue * 2);
+            biggerOther.RecordValue(testValueLevel);
+            biggerOther.RecordValue(testValueLevel * 1000);
+            biggerOther.RecordValue(highestTrackableValue * 2);
 
             // Adding the smaller histogram to the bigger one should work:
             biggerOther.add(histogram);
@@ -286,10 +286,10 @@ namespace HdrHistogram.Tests
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
             Histogram other = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
-            histogram.recordValue(testValueLevel * 1000);
-            other.recordValue(testValueLevel);
-            other.recordValue(testValueLevel * 1000);
+            histogram.RecordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel * 1000);
+            other.RecordValue(testValueLevel);
+            other.RecordValue(testValueLevel * 1000);
             histogram.add(other);
             Assert.Equal(2L, histogram.getCountAtValue(testValueLevel));
             Assert.Equal(2L, histogram.getCountAtValue(testValueLevel * 1000));
@@ -322,9 +322,9 @@ namespace HdrHistogram.Tests
 
 
             Histogram biggerOther = new Histogram(highestTrackableValue * 2, numberOfSignificantValueDigits);
-            biggerOther.recordValue(testValueLevel);
-            biggerOther.recordValue(testValueLevel * 1000);
-            biggerOther.recordValue(highestTrackableValue * 2);
+            biggerOther.RecordValue(testValueLevel);
+            biggerOther.RecordValue(testValueLevel * 1000);
+            biggerOther.RecordValue(highestTrackableValue * 2);
             biggerOther.add(biggerOther);
             biggerOther.add(biggerOther);
             Assert.Equal(4L, biggerOther.getCountAtValue(testValueLevel));
@@ -466,10 +466,10 @@ namespace HdrHistogram.Tests
             Assert.Throws<InvalidOperationException>(() =>
             {
                 ShortCountsHistogram histogram = new ShortCountsHistogram(highestTrackableValue, 2);
-                histogram.recordValue(testValueLevel);
-                histogram.recordValue(testValueLevel * 10);
+                histogram.RecordValue(testValueLevel);
+                histogram.RecordValue(testValueLevel * 10);
                 // This should overflow a ShortHistogram:
-                histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 500);
+                histogram.RecordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 500);
             });
         }
 
@@ -477,49 +477,49 @@ namespace HdrHistogram.Tests
         public void testCopy()
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
-            histogram.recordValue(testValueLevel * 10);
-            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+            histogram.RecordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel * 10);
+            histogram.RecordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of Histogram:");
             assertEqual(histogram, histogram.copy());
 
             IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            intCountsHistogram.recordValue(testValueLevel);
-            intCountsHistogram.recordValue(testValueLevel * 10);
-            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            intCountsHistogram.RecordValue(testValueLevel);
+            intCountsHistogram.RecordValue(testValueLevel * 10);
+            intCountsHistogram.RecordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of IntHistogram:");
             assertEqual(intCountsHistogram, intCountsHistogram.copy());
 
             ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            shortCountsHistogram.recordValue(testValueLevel);
-            shortCountsHistogram.recordValue(testValueLevel * 10);
-            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            shortCountsHistogram.RecordValue(testValueLevel);
+            shortCountsHistogram.RecordValue(testValueLevel * 10);
+            shortCountsHistogram.RecordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of ShortHistogram:");
             assertEqual(shortCountsHistogram, shortCountsHistogram.copy());
 
             AtomicHistogram atomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            atomicHistogram.recordValue(testValueLevel);
-            atomicHistogram.recordValue(testValueLevel * 10);
-            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+            atomicHistogram.RecordValue(testValueLevel);
+            atomicHistogram.RecordValue(testValueLevel * 10);
+            atomicHistogram.RecordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of AtomicHistogram:");
             assertEqual(atomicHistogram, atomicHistogram.copy());
 
             ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            concurrentHistogram.recordValue(testValueLevel);
-            concurrentHistogram.recordValue(testValueLevel * 10);
-            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+            concurrentHistogram.RecordValue(testValueLevel);
+            concurrentHistogram.RecordValue(testValueLevel * 10);
+            concurrentHistogram.RecordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of ConcurrentHistogram:");
             assertEqual(concurrentHistogram, concurrentHistogram.copy());
 
             SynchronizedHistogram syncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            syncHistogram.recordValue(testValueLevel);
-            syncHistogram.recordValue(testValueLevel * 10);
-            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+            syncHistogram.RecordValue(testValueLevel);
+            syncHistogram.RecordValue(testValueLevel * 10);
+            syncHistogram.RecordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of SynchronizedHistogram:");
             assertEqual(syncHistogram, syncHistogram.copy());
@@ -529,49 +529,49 @@ namespace HdrHistogram.Tests
         public void testScaledCopy()
         {
             Histogram histogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
-            histogram.recordValue(testValueLevel * 10);
-            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+            histogram.RecordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel * 10);
+            histogram.RecordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of scaled Histogram:");
             assertEqual(histogram, histogram.copy());
 
             IntCountsHistogram intCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            intCountsHistogram.recordValue(testValueLevel);
-            intCountsHistogram.recordValue(testValueLevel * 10);
-            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            intCountsHistogram.RecordValue(testValueLevel);
+            intCountsHistogram.RecordValue(testValueLevel * 10);
+            intCountsHistogram.RecordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of scaled IntHistogram:");
             assertEqual(intCountsHistogram, intCountsHistogram.copy());
 
             ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            shortCountsHistogram.recordValue(testValueLevel);
-            shortCountsHistogram.recordValue(testValueLevel * 10);
-            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            shortCountsHistogram.RecordValue(testValueLevel);
+            shortCountsHistogram.RecordValue(testValueLevel * 10);
+            shortCountsHistogram.RecordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of scaled ShortHistogram:");
             assertEqual(shortCountsHistogram, shortCountsHistogram.copy());
 
             AtomicHistogram atomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            atomicHistogram.recordValue(testValueLevel);
-            atomicHistogram.recordValue(testValueLevel * 10);
-            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+            atomicHistogram.RecordValue(testValueLevel);
+            atomicHistogram.RecordValue(testValueLevel * 10);
+            atomicHistogram.RecordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of scaled AtomicHistogram:");
             assertEqual(atomicHistogram, atomicHistogram.copy());
 
             ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            concurrentHistogram.recordValue(testValueLevel);
-            concurrentHistogram.recordValue(testValueLevel * 10);
-            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+            concurrentHistogram.RecordValue(testValueLevel);
+            concurrentHistogram.RecordValue(testValueLevel * 10);
+            concurrentHistogram.RecordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of scaled ConcurrentHistogram:");
             assertEqual(concurrentHistogram, concurrentHistogram.copy());
 
             SynchronizedHistogram syncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            syncHistogram.recordValue(testValueLevel);
-            syncHistogram.recordValue(testValueLevel * 10);
-            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+            syncHistogram.RecordValue(testValueLevel);
+            syncHistogram.RecordValue(testValueLevel * 10);
+            syncHistogram.RecordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copy of scaled SynchronizedHistogram:");
             assertEqual(syncHistogram, syncHistogram.copy());
@@ -582,15 +582,15 @@ namespace HdrHistogram.Tests
         {
             Histogram histogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
             Histogram targetHistogram = new Histogram(highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
-            histogram.recordValue(testValueLevel * 10);
-            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+            histogram.RecordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel * 10);
+            histogram.RecordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for Histogram:");
             histogram.copyInto(targetHistogram);
             assertEqual(histogram, targetHistogram);
 
-            histogram.recordValue(testValueLevel * 20);
+            histogram.RecordValue(testValueLevel * 20);
 
             histogram.copyInto(targetHistogram);
             assertEqual(histogram, targetHistogram);
@@ -598,15 +598,15 @@ namespace HdrHistogram.Tests
 
             IntCountsHistogram intCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             IntCountsHistogram targetIntCountsHistogram = new IntCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            intCountsHistogram.recordValue(testValueLevel);
-            intCountsHistogram.recordValue(testValueLevel * 10);
-            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            intCountsHistogram.RecordValue(testValueLevel);
+            intCountsHistogram.RecordValue(testValueLevel * 10);
+            intCountsHistogram.RecordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for IntHistogram:");
             intCountsHistogram.copyInto(targetIntCountsHistogram);
             assertEqual(intCountsHistogram, targetIntCountsHistogram);
 
-            intCountsHistogram.recordValue(testValueLevel * 20);
+            intCountsHistogram.RecordValue(testValueLevel * 20);
 
             intCountsHistogram.copyInto(targetIntCountsHistogram);
             assertEqual(intCountsHistogram, targetIntCountsHistogram);
@@ -614,15 +614,15 @@ namespace HdrHistogram.Tests
 
             ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             ShortCountsHistogram targetShortCountsHistogram = new ShortCountsHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            shortCountsHistogram.recordValue(testValueLevel);
-            shortCountsHistogram.recordValue(testValueLevel * 10);
-            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            shortCountsHistogram.RecordValue(testValueLevel);
+            shortCountsHistogram.RecordValue(testValueLevel * 10);
+            shortCountsHistogram.RecordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for ShortHistogram:");
             shortCountsHistogram.copyInto(targetShortCountsHistogram);
             assertEqual(shortCountsHistogram, targetShortCountsHistogram);
 
-            shortCountsHistogram.recordValue(testValueLevel * 20);
+            shortCountsHistogram.RecordValue(testValueLevel * 20);
 
             shortCountsHistogram.copyInto(targetShortCountsHistogram);
             assertEqual(shortCountsHistogram, targetShortCountsHistogram);
@@ -630,15 +630,15 @@ namespace HdrHistogram.Tests
 
             AtomicHistogram atomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             AtomicHistogram targetAtomicHistogram = new AtomicHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            atomicHistogram.recordValue(testValueLevel);
-            atomicHistogram.recordValue(testValueLevel * 10);
-            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+            atomicHistogram.RecordValue(testValueLevel);
+            atomicHistogram.RecordValue(testValueLevel * 10);
+            atomicHistogram.RecordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for AtomicHistogram:");
             atomicHistogram.copyInto(targetAtomicHistogram);
             assertEqual(atomicHistogram, targetAtomicHistogram);
 
-            atomicHistogram.recordValue(testValueLevel * 20);
+            atomicHistogram.RecordValue(testValueLevel * 20);
 
             atomicHistogram.copyInto(targetAtomicHistogram);
             assertEqual(atomicHistogram, targetAtomicHistogram);
@@ -646,15 +646,15 @@ namespace HdrHistogram.Tests
 
             ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             ConcurrentHistogram targetConcurrentHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            concurrentHistogram.recordValue(testValueLevel);
-            concurrentHistogram.recordValue(testValueLevel * 10);
-            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+            concurrentHistogram.RecordValue(testValueLevel);
+            concurrentHistogram.RecordValue(testValueLevel * 10);
+            concurrentHistogram.RecordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for ConcurrentHistogram:");
             concurrentHistogram.copyInto(targetConcurrentHistogram);
             assertEqual(concurrentHistogram, targetConcurrentHistogram);
 
-            concurrentHistogram.recordValue(testValueLevel * 20);
+            concurrentHistogram.RecordValue(testValueLevel * 20);
 
             concurrentHistogram.copyInto(targetConcurrentHistogram);
             assertEqual(concurrentHistogram, targetConcurrentHistogram);
@@ -662,15 +662,15 @@ namespace HdrHistogram.Tests
 
             SynchronizedHistogram syncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
             SynchronizedHistogram targetSyncHistogram = new SynchronizedHistogram(highestTrackableValue, numberOfSignificantValueDigits);
-            syncHistogram.recordValue(testValueLevel);
-            syncHistogram.recordValue(testValueLevel * 10);
-            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+            syncHistogram.RecordValue(testValueLevel);
+            syncHistogram.RecordValue(testValueLevel * 10);
+            syncHistogram.RecordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for SynchronizedHistogram:");
             syncHistogram.copyInto(targetSyncHistogram);
             assertEqual(syncHistogram, targetSyncHistogram);
 
-            syncHistogram.recordValue(testValueLevel * 20);
+            syncHistogram.RecordValue(testValueLevel * 20);
 
             syncHistogram.copyInto(targetSyncHistogram);
             assertEqual(syncHistogram, targetSyncHistogram);
@@ -681,15 +681,15 @@ namespace HdrHistogram.Tests
         {
             Histogram histogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
             Histogram targetHistogram = new Histogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            histogram.recordValue(testValueLevel);
-            histogram.recordValue(testValueLevel * 10);
-            histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
+            histogram.RecordValue(testValueLevel);
+            histogram.RecordValue(testValueLevel * 10);
+            histogram.RecordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for scaled Histogram:");
             histogram.copyInto(targetHistogram);
             assertEqual(histogram, targetHistogram);
 
-            histogram.recordValue(testValueLevel * 20);
+            histogram.RecordValue(testValueLevel * 20);
 
             histogram.copyInto(targetHistogram);
             assertEqual(histogram, targetHistogram);
@@ -697,15 +697,15 @@ namespace HdrHistogram.Tests
 
             IntCountsHistogram intCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
             IntCountsHistogram targetIntCountsHistogram = new IntCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            intCountsHistogram.recordValue(testValueLevel);
-            intCountsHistogram.recordValue(testValueLevel * 10);
-            intCountsHistogram.recordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            intCountsHistogram.RecordValue(testValueLevel);
+            intCountsHistogram.RecordValue(testValueLevel * 10);
+            intCountsHistogram.RecordValueWithExpectedInterval(intCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for scaled IntHistogram:");
             intCountsHistogram.copyInto(targetIntCountsHistogram);
             assertEqual(intCountsHistogram, targetIntCountsHistogram);
 
-            intCountsHistogram.recordValue(testValueLevel * 20);
+            intCountsHistogram.RecordValue(testValueLevel * 20);
 
             intCountsHistogram.copyInto(targetIntCountsHistogram);
             assertEqual(intCountsHistogram, targetIntCountsHistogram);
@@ -713,15 +713,15 @@ namespace HdrHistogram.Tests
 
             ShortCountsHistogram shortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
             ShortCountsHistogram targetShortCountsHistogram = new ShortCountsHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            shortCountsHistogram.recordValue(testValueLevel);
-            shortCountsHistogram.recordValue(testValueLevel * 10);
-            shortCountsHistogram.recordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
+            shortCountsHistogram.RecordValue(testValueLevel);
+            shortCountsHistogram.RecordValue(testValueLevel * 10);
+            shortCountsHistogram.RecordValueWithExpectedInterval(shortCountsHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for scaled ShortHistogram:");
             shortCountsHistogram.copyInto(targetShortCountsHistogram);
             assertEqual(shortCountsHistogram, targetShortCountsHistogram);
 
-            shortCountsHistogram.recordValue(testValueLevel * 20);
+            shortCountsHistogram.RecordValue(testValueLevel * 20);
 
             shortCountsHistogram.copyInto(targetShortCountsHistogram);
             assertEqual(shortCountsHistogram, targetShortCountsHistogram);
@@ -729,14 +729,14 @@ namespace HdrHistogram.Tests
 
             AtomicHistogram atomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
             AtomicHistogram targetAtomicHistogram = new AtomicHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            atomicHistogram.recordValue(testValueLevel);
-            atomicHistogram.recordValue(testValueLevel * 10);
-            atomicHistogram.recordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
+            atomicHistogram.RecordValue(testValueLevel);
+            atomicHistogram.RecordValue(testValueLevel * 10);
+            atomicHistogram.RecordValueWithExpectedInterval(atomicHistogram.getHighestTrackableValue() - 1, 31000);
 
             atomicHistogram.copyInto(targetAtomicHistogram);
             assertEqual(atomicHistogram, targetAtomicHistogram);
 
-            atomicHistogram.recordValue(testValueLevel * 20);
+            atomicHistogram.RecordValue(testValueLevel * 20);
 
             Trace.WriteLine("Testing copyInto for scaled AtomicHistogram:");
             atomicHistogram.copyInto(targetAtomicHistogram);
@@ -745,14 +745,14 @@ namespace HdrHistogram.Tests
 
             ConcurrentHistogram concurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
             ConcurrentHistogram targetConcurrentHistogram = new ConcurrentHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            concurrentHistogram.recordValue(testValueLevel);
-            concurrentHistogram.recordValue(testValueLevel * 10);
-            concurrentHistogram.recordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
+            concurrentHistogram.RecordValue(testValueLevel);
+            concurrentHistogram.RecordValue(testValueLevel * 10);
+            concurrentHistogram.RecordValueWithExpectedInterval(concurrentHistogram.getHighestTrackableValue() - 1, 31000);
 
             concurrentHistogram.copyInto(targetConcurrentHistogram);
             assertEqual(concurrentHistogram, targetConcurrentHistogram);
 
-            concurrentHistogram.recordValue(testValueLevel * 20);
+            concurrentHistogram.RecordValue(testValueLevel * 20);
 
             Trace.WriteLine("Testing copyInto for scaled ConcurrentHistogram:");
             concurrentHistogram.copyInto(targetConcurrentHistogram);
@@ -761,15 +761,15 @@ namespace HdrHistogram.Tests
 
             SynchronizedHistogram syncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
             SynchronizedHistogram targetSyncHistogram = new SynchronizedHistogram(1000, highestTrackableValue, numberOfSignificantValueDigits);
-            syncHistogram.recordValue(testValueLevel);
-            syncHistogram.recordValue(testValueLevel * 10);
-            syncHistogram.recordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
+            syncHistogram.RecordValue(testValueLevel);
+            syncHistogram.RecordValue(testValueLevel * 10);
+            syncHistogram.RecordValueWithExpectedInterval(syncHistogram.getHighestTrackableValue() - 1, 31000);
 
             Trace.WriteLine("Testing copyInto for scaled SynchronizedHistogram:");
             syncHistogram.copyInto(targetSyncHistogram);
             assertEqual(syncHistogram, targetSyncHistogram);
 
-            syncHistogram.recordValue(testValueLevel * 20);
+            syncHistogram.RecordValue(testValueLevel * 20);
 
             syncHistogram.copyInto(targetSyncHistogram);
             assertEqual(syncHistogram, targetSyncHistogram);
@@ -778,9 +778,9 @@ namespace HdrHistogram.Tests
         // TODO: serialization tests
 
         //    void testAbstractSerialization(AbstractHistogram histogram){
-        //        histogram.recordValue(testValueLevel);
-        //        histogram.recordValue(testValueLevel * 10);
-        //        histogram.recordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 255);
+        //        histogram.RecordValue(testValueLevel);
+        //        histogram.RecordValue(testValueLevel * 10);
+        //        histogram.RecordValueWithExpectedInterval(histogram.getHighestTrackableValue() - 1, 255);
         //        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         //        ObjectOutput out = null;
         //        ByteArrayInputStream bis = null;
